@@ -15,9 +15,9 @@ class PlayerInfo {
     /* comingoutした役職 */
     private List<Role> selfCO = new ArrayList<>();
     /* 占い結果リスト */
-    private Map<Agent, Species> divMap;
+    private Map<Agent, Species> divMap = new HashMap<>();
     /* 霊能結果リスト */
-    private Map<Agent, Species> idenMap;
+    private Map<Agent, Species> idenMap = new HashMap<>();
     /* 襲撃されたか */
     private boolean isAttacked = false;
     /* 追放されたか */

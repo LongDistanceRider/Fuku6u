@@ -48,6 +48,8 @@ public class Fuku6u implements Player {
         Log.info("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
         switch (gameInfo.getDay()) {
+            case 0: // 0日目
+                return;
             case 1: // 1日目
                 boardSurface.setAssignRole(gameInfo.getRole());  // 役職セット
                 break;
@@ -59,7 +61,7 @@ public class Fuku6u implements Player {
                 // 被噛み　null の場合はGJ発生
                 Agent attackedAgent = null;
                 for (Agent agent :
-                        gameInfo.getLastDeadAgentList()) {  // ここには前日の追放者と被害者の2つのAgentが入ってくると思っているが正しいか？
+                        gameInfo.getLastDeadAgentList()) {  // 狐がいると2人返ってくると思われるため，この処理のままにしておく
                     Log.trace("getLastDeadAgentListで返ってくるAgent: " + agent);
                     if (!agent.equals(executedAgent)) {
                         attackedAgent = agent;
@@ -67,7 +69,7 @@ public class Fuku6u implements Player {
                 }
                 if (attackedAgent != null) {
                     boardSurface.attackedAgent(attackedAgent);
-                    Log.info("被害者 : " + executedAgent);
+                    Log.info("被害者 : " + attackedAgent);
                 } else {
                     Log.info("被害者 : なし（GJ発生）");
                 }

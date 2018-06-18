@@ -3,5 +3,6 @@
 /bin/
 /lib/
 /gradle/
+/otherPlayer/
 *.test
 *.swp
