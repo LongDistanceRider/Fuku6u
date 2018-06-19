@@ -2,6 +2,9 @@ package fuku6u.player;
 
 import fuku6u.board.BoardSurface;
 import fuku6u.log.Log;
+import fuku6u.observation.Observation;
+import fuku6u.posessedExpectation.PosessedExpectation;
+import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.client.lib.Content;
 import org.aiwolf.common.data.Talk;
 
@@ -16,7 +19,7 @@ public class TalkProcessing {
     private static int talkListHead = 0;
 
     // トークリストを全て保管することはせず，必要な要素を必要な形でBoardSurfaceに書き込む
-    public static void update(List<Talk> talkList, BoardSurface boardSurface) {
+    public static void update(List<Talk> talkList, BoardSurface boardSurface, WolfGroupExpectation wExpect, PosessedExpectation pExpect) {
         for (int i = talkListHead; i < talkList.size(); i++) {
             Talk talk = talkList.get(i);
             Log.info("Taker: " + talk.getAgent() + " mes: " + talk.getText());
@@ -38,6 +41,7 @@ public class TalkProcessing {
                 case DIVINED:
                     Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget() + " DIV: " + content.getResult());
                     boardSurface.addDivMap(talk.getAgent(), content.getTarget(), content.getResult()); // 占い結果を保管
+                    Observation.divined(boardSurface, wExpect, pExpect, talk.getAgent(), content.getTarget(), content.getResult());
                     break;
                 case IDENTIFIED:
                     Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget() + " DIV: " + content.getResult());

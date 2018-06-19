@@ -2,6 +2,9 @@ package fuku6u.player;
 
 import fuku6u.board.BoardSurface;
 import fuku6u.log.Log;
+import fuku6u.observation.Observation;
+import fuku6u.posessedExpectation.PosessedExpectation;
+import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.client.lib.Content;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Player;
@@ -19,6 +22,10 @@ public class Fuku6u implements Player {
     private GameInfo gameInfo;
     /* 盤面 */
     private BoardSurface boardSurface;
+    /* 人狼グループ */
+    private WolfGroupExpectation wolfGroupExpectation;
+    /* 狂人予想 */
+    private PosessedExpectation posessedExpectation;
     /* 発言リスト */
     private static LinkedList<String> talkQueue = new LinkedList<>();
     /* finish()フラグ */
@@ -29,6 +36,7 @@ public class Fuku6u implements Player {
         Log.debug("initialize()実行");
         this.gameInfo = gameInfo;
         boardSurface = new BoardSurface(gameInfo);
+        wolfGroupExpectation = new WolfGroupExpectation(gameInfo);
         isFinish = false;
     }
 
@@ -37,7 +45,7 @@ public class Fuku6u implements Player {
         Log.debug("update()実行");
         this.gameInfo = gameInfo;
         // 発言処理
-        TalkProcessing.update(gameInfo.getTalkList(), boardSurface);
+        TalkProcessing.update(gameInfo.getTalkList(), boardSurface, wolfGroupExpectation, posessedExpectation);
     }
 
     @Override
@@ -74,6 +82,7 @@ public class Fuku6u implements Player {
                     Log.info("被害者 : なし（GJ発生）");
                 }
                 boardSurface.getAssignRole().dayStart(boardSurface);    // 役職固有の処理
+                Observation.dayStart(wolfGroupExpectation, attackedAgent);  // 観測
         }
 
     }
@@ -96,6 +105,7 @@ public class Fuku6u implements Player {
     public Agent vote() {
         Log.debug("vote()実行");
         // TODO vote先の検討はまだ先
+        // 人狼予想グループクラスから，不信度の高いグループを吐き出す
         // 黒判定されたエージェントがいれば追放
         List<Agent> blackDivinedAgentList = boardSurface.getBlackDivinedAgentList();
         if (!blackDivinedAgentList.isEmpty()) {

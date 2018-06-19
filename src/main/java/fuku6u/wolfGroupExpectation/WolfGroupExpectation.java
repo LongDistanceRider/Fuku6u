@@ -1,6 +1,7 @@
 package fuku6u.wolfGroupExpectation;
 
 import org.aiwolf.common.data.Agent;
+import org.aiwolf.common.net.GameInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,16 +11,19 @@ import java.util.Map;
 public class WolfGroupExpectation {
 
     /* WolfGroupマップ */
-    private static Map<WolfGroup, Boolean> isWolfGroupMap = new HashMap<>();
-    /* Agentの灰・黒可能性フラグ（各白はfalse） */
-    private static Map<Agent, Boolean> isAgentDistrustMap = new HashMap<>();
+    private Map<WolfGroup, Boolean> isWolfGroupMap = new HashMap<>();
+    /* Agentの灰・黒可能性フラグ（各白はfalse） */ // TODO このリスト必要ないかも　要検討
+    private Map<Agent, Boolean> isAgentDistrustMap = new HashMap<>();
+    /* エージェントの不信度 */
+    private Map<Agent, Integer> agentDistrustMap = new HashMap<>();
 
     /**
      * コンストラクタ
-     * @param agentList
-     *  参加者エージェント（自分自身を除く）
+     * @param gameInfo
      */
-    public WolfGroupExpectation(List<Agent> agentList) {
+    public WolfGroupExpectation(GameInfo gameInfo) {
+        List<Agent> agentList = gameInfo.getAliveAgentList();   // 参加エージェント
+        agentList.remove(gameInfo.getAgent()); // 自分自身は除く
         for (int i = 0; i < agentList.size(); i++) {
             for (int j = i+1; j < agentList.size(); j++) {
                 for (int k = j+1; k < agentList.size(); k++) {
@@ -33,6 +37,32 @@ public class WolfGroupExpectation {
                 }
             }
             isAgentDistrustMap.put(agentList.get(i), Boolean.TRUE);   // フラグ初期化
+            agentDistrustMap.put(agentList.get(i), 0);
         }
+    }
+
+    /**
+     * エージェントの疑い度を更新
+     * @param agent
+     *  更新するエージェント
+     * @param addDistrust
+     *  追加する疑い度
+     */
+    public void agentDistrustCalc (Agent agent, int addDistrust) {
+        int preDistrust = agentDistrustMap.get(agent);
+        int distrust = preDistrust + addDistrust;
+        agentDistrustMap.put(agent, distrust);
+    }
+
+    /**
+     * 特定のエージェントがいるグループを削除(FALSEをセット）する
+     * @param agent
+     */
+    public void deleteGroup(Agent agent) {
+        isWolfGroupMap.forEach(((wolfGroup, boo) -> {
+            if (wolfGroup.inAgent(agent)) {
+                isWolfGroupMap.put(wolfGroup, Boolean.TRUE);
+            }
+        }));
     }
 }
