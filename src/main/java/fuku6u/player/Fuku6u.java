@@ -104,7 +104,7 @@ public class Fuku6u implements Player {
     @Override
     public Agent vote() {
         Log.debug("vote()実行");
-        // TODO vote先の検討はまだ先
+        Observation.vote(boardSurface);
         // 人狼予想グループクラスから，不信度の高いグループを取り出す
         List<Agent> blackList = wolfGroupExpectation.getBlackAgent();   // 投票すべきエージェントのリストを取得
         return randomElementSelect(blackList);

@@ -1,6 +1,7 @@
 package fuku6u.observation;
 
 import fuku6u.board.BoardSurface;
+import fuku6u.log.Log;
 import fuku6u.posessedExpectation.PosessedExpectation;
 import fuku6u.posessedExpectation.PosessedParameter;
 import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
@@ -72,6 +73,13 @@ public class Observation {
                 seerCOList.forEach(seerCOAgent -> pExpect.addAgentSuspect(seerCOAgent, PosessedParameter.getConviction_pose()));
             }
         }
+        // 白を出されたエージェントは白寄りに
+        if (result.equals(Species.HUMAN)) {
+            wExpect.agentDistrustCalc(target, WolfGroupParameter.getLikely_White());
+        } else {
+            // 黒を出されたエージェントは黒寄りに
+            wExpect.agentDistrustCalc(target, WolfGroupParameter.getLikely_Black());
+        }
     }
 
     /**
@@ -79,8 +87,42 @@ public class Observation {
      * 観測対象: 発言したエージェントと役職
      * 処理対象: 占い師CO・霊能COしたエージェントが1人の場合は確定白としてグループから削除
      *          自身が占い師の場合，霊能者の場合は，対抗は狂狼を確信
+     *          占い師または霊能が2人以上の場合は狂狼が混ざっているため，少し不信度をあげる？
      */
     public static void comingout() {
+
+    }
+
+    /**
+     * 投票決定前にBoardSurfaceから取れる情報より状態を更新する（前提: 1日目に占い師と霊能者のCOが終わっている）
+     * 観測箇所: vote()
+     * 観測対象: BoardSurface
+     * 処理対象: 確定白・確定黒が存在するか
+     *          ○-○進行によって人狼グループの更新をかける
+     */
+    public static void vote(BoardSurface bs) {
+        // TODO 確定白が存在する場合 => そのエージェントがいるグループは削除
+        // TODO 確定黒が存在する場合 => そのエージェントがいるグループのみ残す
+        // TODO ○-○進行によって処理を変える(後回し)
+        int seerCONum = bs.getComingOutAgentList(Role.SEER).size();
+        int mediumCONum = bs.getComingOutAgentList(Role.MEDIUM).size();
+        String progress = seerCONum + "-" + mediumCONum;
+        switch (progress) {
+            case "0-0":
+                break;
+            case "0-1":
+                break;
+            case "1-0":
+                break;
+            case "1-1":
+                break;
+            case "1-2":
+                break;
+            case "1-3":
+                break;
+            default:
+                Log.debug("想定していない進行を確認");
+        }
 
     }
 }

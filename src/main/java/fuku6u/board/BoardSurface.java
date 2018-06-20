@@ -140,6 +140,27 @@ public class BoardSurface {
         return blackDivinedAgentList;
     }
 
+    /**
+     * 白判定を出されたエージェントのリストを返す
+     * @return
+     */
+    public List<Agent> getWhiteDivinedAgentList () {
+        List<Agent> whiteDivinedAgentList = new ArrayList<>();
+
+        List<Agent> comingoutSeerList = getComingOutAgentList(Role.SEER);
+        for (Agent seerAgent :
+                comingoutSeerList) {
+            Map<Agent, Species> divinedResultMap = getDivinedResult(seerAgent);
+            for (Map.Entry<Agent, Species> divinedResult :
+                    divinedResultMap.entrySet()) {
+                if (divinedResult.getValue().equals(Species.HUMAN)) {
+                    whiteDivinedAgentList.add(divinedResult.getKey());
+                }
+            }
+        }
+        return whiteDivinedAgentList;
+    }
+
 
     /*
         PlayerInfo操作

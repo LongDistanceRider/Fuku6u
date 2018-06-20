@@ -18,6 +18,8 @@ public class WolfGroupExpectation {
     private Map<Agent, Boolean> isAgentDistrustMap = new HashMap<>();
     /* エージェントの不信度 */
     private Map<Agent, Integer> agentDistrustMap = new HashMap<>();
+    /* 重複計算の回避リスト */
+    List<String> flagList = new ArrayList<>();
 
     /**
      * コンストラクタ
@@ -52,9 +54,19 @@ public class WolfGroupExpectation {
      *  追加する疑い度
      */
     public void agentDistrustCalc (Agent agent, int addDistrust) {
-        int preDistrust = agentDistrustMap.get(agent);
-        int distrust = preDistrust + addDistrust;
-        agentDistrustMap.put(agent, distrust);
+        // 同じ箇所から同じ情報を複数加算することを回避するために，フラグ処理を施す
+        StackTraceElement[] stackTraceElements = (new Throwable()).getStackTrace(); // スタックトレースより呼び出し元情報の取り出し
+        String methodName = stackTraceElements[1].getMethodName();
+        String className = stackTraceElements[1].getClassName();
+        int line = stackTraceElements[1].getLineNumber();
+
+        String flagString = className + methodName + line + agent + addDistrust; // フラグ名作成
+        if (!flagList.contains(flagString)) {
+            int preDistrust = agentDistrustMap.get(agent);
+            int distrust = preDistrust + addDistrust;
+            agentDistrustMap.put(agent, distrust);
+            flagList.add(flagString);
+        }
     }
 
     /**
