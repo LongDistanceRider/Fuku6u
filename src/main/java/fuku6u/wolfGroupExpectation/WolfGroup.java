@@ -10,6 +10,10 @@ class WolfGroup {
     /* エージェントリスト */
     List<Agent> groupList = new ArrayList<>();
 
+    public List<Agent> getGroupList() {
+        return groupList;
+    }
+
     /**
      * コンストラクタ
      * @param agentList
@@ -33,4 +37,6 @@ class WolfGroup {
         }
         return false;
     }
+
+
 }

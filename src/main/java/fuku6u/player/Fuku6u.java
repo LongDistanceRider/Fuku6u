@@ -105,13 +105,9 @@ public class Fuku6u implements Player {
     public Agent vote() {
         Log.debug("vote()実行");
         // TODO vote先の検討はまだ先
-        // 人狼予想グループクラスから，不信度の高いグループを吐き出す
-        // 黒判定されたエージェントがいれば追放
-        List<Agent> blackDivinedAgentList = boardSurface.getBlackDivinedAgentList();
-        if (!blackDivinedAgentList.isEmpty()) {
-            return randomElementSelect(blackDivinedAgentList);
-        }
-        return null;
+        // 人狼予想グループクラスから，不信度の高いグループを取り出す
+        List<Agent> blackList = wolfGroupExpectation.getBlackAgent();   // 投票すべきエージェントのリストを取得
+        return randomElementSelect(blackList);
     }
 
     @Override
