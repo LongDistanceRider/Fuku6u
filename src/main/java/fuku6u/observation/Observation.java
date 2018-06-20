@@ -10,6 +10,7 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ある地点において観測すべき状態をまとめたクラス
@@ -27,10 +28,20 @@ public class Observation {
      * @param attackedAgent
      *  襲撃されたエージェント
      */
-    public static void dayStart(WolfGroupExpectation wolfGroupExpectation, Agent attackedAgent) {
+    public static void dayStart(BoardSurface bs, WolfGroupExpectation wExpect, PosessedExpectation pExpect, Agent attackedAgent) {
         // 襲撃されたプレイヤは人狼グループにいない => グループから削除
-        wolfGroupExpectation.deleteGroup(attackedAgent);
-        // 占い師が黒出ししたプレイヤが襲撃された =>　占い師は偽物
+        wExpect.deleteGroup(attackedAgent);
+        // 占い師が黒出ししたプレイヤが襲撃された =>　占い師は偽物　=> 狂狼の可能性が高い（特に狂人）（人狼がやる行動ではないがプロトコル部門ではあり得るのでは）
+        for (Agent seerCOAgent :
+                bs.getComingOutAgentList(Role.SEER)) {  // 占い師COしたエージェント
+            for (Map.Entry<Agent, Species> divinedResult:
+                 bs.getDivinedResult(seerCOAgent).entrySet()) { // 占い結果
+                if (divinedResult.getKey().equals(attackedAgent) && divinedResult.getValue().equals(Species.WEREWOLF)) {    // 襲撃されたプレイヤに対して黒判定を出していた場合
+                    wExpect.agentDistrustCalc(seerCOAgent, WolfGroupParameter.getConviction_PoseWolf());   // 狂狼を確信
+                    pExpect.addAgentSuspect(seerCOAgent, PosessedParameter.getConviction_pose_wolf());  // ほぼ狂もしかしたら狼を確信
+                }
+            }
+        }
     }
 
     /**
@@ -46,10 +57,10 @@ public class Observation {
         if (bs.getAssignRole().getRole() != Role.WEREWOLF) {  // 自分が人狼ではない場合
             if (target.equals(bs.getMe())) {  // 対象が自分
                 if (result.equals(Species.WEREWOLF)) { // 自分に黒出しされた
-                    wExpect.agentDistrustCalc(seerAgent, WolfGroupParameter.getConviction_pose_were());    // 黒より
-                    pExpect.agentSispectCalc(seerAgent, PosessedParameter.getMay_pose());    // 狂人の可能性を少しあげる
+                    wExpect.agentDistrustCalc(seerAgent, WolfGroupParameter.getConviction_PoseWolf());    // 黒より
+                    pExpect.addAgentSuspect(seerAgent, PosessedParameter.getMay_pose());    // 狂人の可能性を少しあげる
                 } else {    // 白だしされた
-                    wExpect.agentDistrustCalc(seerAgent, WolfGroupParameter.getUnlikely_were());   // 白より
+                    wExpect.agentDistrustCalc(seerAgent, WolfGroupParameter.getUnlikely_Wolf());   // 白より
                 }
             }
         } else {    // 自分が人狼である場合 => 占い師は真　かつ　他の占い師は狂人 => (グループから削除) PosessedExpectationに処理を送る
@@ -58,8 +69,18 @@ public class Observation {
             List<Agent> seerCOList = bs.getComingOutAgentList(Role.SEER);
             seerCOList.remove(seerAgent);   // 真占い師をリムーブ
             if (!seerCOList.isEmpty()) {
-                seerCOList.forEach(seerCOAgent -> pExpect.agentSispectCalc(seerCOAgent, PosessedParameter.getConviction_pose()));
+                seerCOList.forEach(seerCOAgent -> pExpect.addAgentSuspect(seerCOAgent, PosessedParameter.getConviction_pose()));
             }
         }
+    }
+
+    /**
+     * 観測箇所: TalkProcessingのCOMINGOUT発言があった場合に呼び出される
+     * 観測対象: 発言したエージェントと役職
+     * 処理対象: 占い師CO・霊能COしたエージェントが1人の場合は確定白としてグループから削除
+     *          自身が占い師の場合，霊能者の場合は，対抗は狂狼を確信
+     */
+    public static void comingout() {
+
     }
 }

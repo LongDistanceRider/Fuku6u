@@ -82,7 +82,7 @@ public class Fuku6u implements Player {
                     Log.info("被害者 : なし（GJ発生）");
                 }
                 boardSurface.getAssignRole().dayStart(boardSurface);    // 役職固有の処理
-                Observation.dayStart(wolfGroupExpectation, attackedAgent);  // 観測
+                Observation.dayStart(boardSurface, wolfGroupExpectation, posessedExpectation, attackedAgent);  // 観測
         }
 
     }

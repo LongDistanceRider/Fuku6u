@@ -6,15 +6,15 @@ package fuku6u.wolfGroupExpectation;
  *
  */
 public class WolfGroupParameter {
-    private static int conviction_pose_wolf = 1000;    // 狂狼を確信
+    private static int conviction_PoseWolf = 1000;    // 狂狼を確信
 
-    private static int unlikely_were = -100;   // 人狼っぽくない
+    private static int unlikely_Wolf = -100;   // 人狼っぽくない
 
-    public static int getConviction_pose_were() {
-        return conviction_pose_wolf;
+    public static int getConviction_PoseWolf() {
+        return conviction_PoseWolf;
     }
 
-    public static int getUnlikely_were() {
-        return unlikely_were;
+    public static int getUnlikely_Wolf() {
+        return WolfGroupParameter.unlikely_Wolf;
     }
 }

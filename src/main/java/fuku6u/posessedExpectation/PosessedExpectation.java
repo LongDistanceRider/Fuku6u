@@ -28,7 +28,7 @@ public class PosessedExpectation {
      * @param addDistrust
      *  追加する疑い度
      */
-    public void agentSispectCalc (Agent agent, int addDistrust) {
+    public void addAgentSuspect(Agent agent, int addDistrust) {
         int preDistrust = posessedSuspectMap.get(agent);
         int distrust = preDistrust + addDistrust;
         posessedSuspectMap.put(agent, distrust);
