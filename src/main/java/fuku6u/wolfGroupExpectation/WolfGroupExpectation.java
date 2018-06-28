@@ -71,12 +71,26 @@ public class WolfGroupExpectation {
 
     /**
      * 特定のエージェントがいるグループを削除(FALSEをセット）する
-     * @param agent
+     * @param whiteAgent
      */
-    public void deleteGroup(Agent agent) {
+    public void deleteGroup(Agent whiteAgent) {
         isWolfGroupMap.forEach(((wolfGroup, boo) -> {
-            if (wolfGroup.inAgent(agent)) {
-                isWolfGroupMap.put(wolfGroup, Boolean.TRUE);
+            if (wolfGroup.inAgent(whiteAgent)) {
+                isWolfGroupMap.put(wolfGroup, Boolean.FALSE);
+            }
+        }));
+    }
+
+    /**
+     * 特定のエージェントがいるグループのみを残す
+     * @param blackAgent
+     */
+    public void remainGroup(Agent blackAgent) {
+        isWolfGroupMap.forEach(((wolfGroup, boo) -> {
+            if (boo) {
+                if (!wolfGroup.inAgent(blackAgent)) {
+                    isWolfGroupMap.put(wolfGroup, Boolean.FALSE);
+                }
             }
         }));
     }

@@ -6,6 +6,7 @@ package fuku6u.possessedExpectation;
  */
 public class PossessedParameter {
     private static int conviction_pose = 1000;    // 狂を確信
+    private static int conviction_wolf = -1000;     // 人狼を確信
 
     private static int conviction_pose_wolf = 100; // ほぼ狂もしかしたら狼の可能性
 
@@ -21,5 +22,9 @@ public class PossessedParameter {
 
     public static int getConviction_pose_wolf() {
         return conviction_pose_wolf;
+    }
+
+    public static int getConviction_wolf() {
+        return conviction_wolf;
     }
 }

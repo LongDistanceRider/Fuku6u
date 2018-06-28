@@ -21,6 +21,9 @@ import java.util.Map;
  * また，特定の発言を行う．
  *  ex: TalkProcessingにてComingout処理をした際に，自分と対抗であった場合WolfGroupExpectationに送る
  *      襲撃者がわかった時点で黒ではないことが確定するため，WolfGroupExpectationに予想グループから外すように処理を送る
+ *
+ * memo: プロダクションシステムのようなクラス
+ *  ワーキングメモリをBoardSurfaceとして，条件部と行動部がメソッド内に書かれる
  */
 public class Observation {
 
@@ -42,13 +45,13 @@ public class Observation {
             for (Map.Entry<Agent, Species> divinedResult:
                  bs.getDivinedResult(seerCOAgent).entrySet()) { // 占い結果
                 if (divinedResult.getKey().equals(attackedAgent) && divinedResult.getValue().equals(Species.WEREWOLF)) {    // 襲撃されたプレイヤに対して黒判定を出していた場合
+                    wExpect.agentDistrustCalc(seerCOAgent, WolfGroupParameter.getConviction_PoseWolf());   // 狂狼を確信
+                    pExpect.addAgentSuspect(seerCOAgent, PossessedParameter.getConviction_pose_wolf());  // ほぼ狂もしかしたら狼を確信
 
                     Utterance.getInstance().offer(Topic.ESTIMATE, seerCOAgent, Role.WEREWOLF);  // 「狼だと思う」
                     Utterance.getInstance().offer(Topic.ESTIMATE, seerCOAgent, Role.POSSESSED);  // 「狂人だと思う」
                     Utterance.getInstance().offer(Topic.VOTE, seerCOAgent); // 「VOTE発言」
-
-                    wExpect.agentDistrustCalc(seerCOAgent, WolfGroupParameter.getConviction_PoseWolf());   // 狂狼を確信
-                    pExpect.addAgentSuspect(seerCOAgent, PossessedParameter.getConviction_pose_wolf());  // ほぼ狂もしかしたら狼を確信
+                    // TODO 真占い師が確定しているか確認する
                 }
             }
         }
@@ -59,6 +62,7 @@ public class Observation {
      * 観測対象: 発言した占い師COエージェント（その他の占い師COしたエージェント）
      * 処理対象: 自分自身に出した判定によって人狼グループ予想をする
      *          自身が人狼の場合，黒出しされたら，真占い師の可能性があるため，その他の占い師COエージェントの狂人確率を少し上げる（誤爆の可能性を考慮する）
+     *          真占い師が確定した時点で，確定白と確定黒を把握し，グループ削除を行う
      * @param seerAgent
      */
     public static void divined(BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect, Agent seerAgent, Agent target, Species result) {
@@ -69,17 +73,37 @@ public class Observation {
                 if (result.equals(Species.WEREWOLF)) { // 自分に黒出しされた
                     wExpect.agentDistrustCalc(seerAgent, WolfGroupParameter.getConviction_PoseWolf());    // 黒より
                     pExpect.addAgentSuspect(seerAgent, PossessedParameter.getMay_pose());    // 狂人の可能性を少しあげる
+                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.POSSESSED);   //「狂人だと思う」
+                    Utterance.getInstance().offer(Topic.VOTE, seerAgent);   // 「VOTE発言」
+                    // 真占い師確定しているか
+                    if (checkGenuineSeer(bs, seerAgent)) {  // 確定
+                        bs.getComingOutAgentList(Role.SEER).forEach(agent -> {
+                            if (!agent.equals(seerAgent)) { // 偽物は削除
+                                findGenuineSeer(bs, wExpect, pExpect, agent);   // 真占い師処理
+                            }
+                        });
+                    }
                 } else {    // 白だしされた
                     wExpect.agentDistrustCalc(seerAgent, WolfGroupParameter.getUnlikely_Wolf());   // 白より
+                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.SEER);    //「占い師だと思う」
                 }
             }
         } else {    // 自分が人狼である場合 => 占い師は真　かつ　他の占い師は狂人 => (グループから削除) PosessedExpectationに処理を送る
             // memo: グループからの削除はしない　自分が人狼だと知った上での人狼グループ予想であるため，また，人狼役職の時の人狼予想は意味がない
             // 占い師COしたエージェントリストを取得
-            List<Agent> seerCOList = bs.getComingOutAgentList(Role.SEER);
-            seerCOList.remove(seerAgent);   // 真占い師をリムーブ
-            if (!seerCOList.isEmpty()) {
-                seerCOList.forEach(seerCOAgent -> pExpect.addAgentSuspect(seerCOAgent, PossessedParameter.getConviction_pose()));
+            if (target.equals(bs.getMe())) { // 対象が自分
+                if (result.equals(Species.WEREWOLF)) {  // 自分に黒出しした
+                    List<Agent> seerCOList = bs.getComingOutAgentList(Role.SEER);
+                    seerCOList.remove(seerAgent);   // 真占い師をリムーブ
+                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.POSSESSED); // 「狂人だと思う」
+                    Utterance.getInstance().offer(Topic.VOTE, seerAgent);   // 「VOTE発言」
+                    if (!seerCOList.isEmpty()) {
+                        seerCOList.forEach(seerCOAgent -> pExpect.addAgentSuspect(seerCOAgent, PossessedParameter.getConviction_pose()));
+                    }
+                } else {    // 自分に白出しした
+                    pExpect.addAgentSuspect(seerAgent, PossessedParameter.getConviction_pose());
+                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.SEER);    //「占い師だと思う」
+                }
             }
         }
         // 白を出されたエージェント（自分以外）は白寄りに
@@ -91,6 +115,7 @@ public class Observation {
                 wExpect.agentDistrustCalc(target, WolfGroupParameter.getLikely_Black());
             }
         }
+        // 
     }
 
     /**
@@ -135,5 +160,44 @@ public class Observation {
                 Log.debug("想定していない進行を確認");
         }
 
+    }
+
+    /**
+     * 真占い師を観測した場合の処理をまとめる
+     */
+    private static void findGenuineSeer(BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect, Agent genuineSeer) {
+        Map<Agent, Species> divinedResultMap = bs.getDivinedResult(genuineSeer); // 真占い師が発言した占い結果を取得
+        for (Map.Entry<Agent, Species> divEntry :
+                divinedResultMap.entrySet()) {
+            if (divEntry.getValue().equals(Species.WEREWOLF)) { // 黒出しエージェント発見
+                wExpect.remainGroup(divEntry.getKey()); // 人狼確定
+                pExpect.addAgentSuspect(divEntry.getKey(), PossessedParameter.getConviction_wolf());
+                Utterance.getInstance().offer(Topic.ESTIMATE, divEntry.getKey(), Role.WEREWOLF);
+                Utterance.getInstance().offer(Topic.VOTE, divEntry.getKey());
+            } else {    // 白だしエージェント発見
+                wExpect.deleteGroup(divEntry.getKey());
+                Utterance.getInstance().offer(Topic.ESTIMATE, divEntry.getKey(), Role.VILLAGER);
+            }
+        }
+    }
+
+    /**
+     * 真占い師が確定しているかをチェックする
+     *
+     * @param fakeSeer
+     *
+     * @return 自分自身が占い師である場合にはfalseを返す．
+     *  真占い師が発見された場合のみtrueを返す．
+     */
+    private static boolean checkGenuineSeer(BoardSurface bs, Agent fakeSeer) {
+        if (bs.getAssignRole().getRole().equals(Role.SEER)) {
+            return false;
+        }
+        List<Agent> seerCOList = bs.getComingOutAgentList(Role.SEER);   // 占い師発言リスト
+        seerCOList.remove(fakeSeer);
+        if (seerCOList.size() == 1) {   // 1人しかいないなら真占確定
+            return true;
+        }
+        return false;
     }
 }

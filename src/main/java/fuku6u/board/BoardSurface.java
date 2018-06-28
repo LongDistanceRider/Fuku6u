@@ -229,7 +229,6 @@ public class BoardSurface {
         getPlayerInfo(attackedAgent).setAttacked(true);
     }
 
-
     /*
         private
      */
@@ -245,6 +244,7 @@ public class BoardSurface {
         }
         return null;
     }
+
     /**
      * 参加者エージェントを返す
      *  （自分は含まない）
@@ -292,7 +292,6 @@ public class BoardSurface {
         }
         return yetDivinedAgentList;
     }
-
 }
 
 
