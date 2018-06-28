@@ -1,4 +1,4 @@
-package fuku6u.posessedExpectation;
+package fuku6u.possessedExpectation;
 
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.net.GameInfo;
@@ -11,14 +11,14 @@ import java.util.Map;
 /**
  * 狂人予想
  */
-public class PosessedExpectation {
+public class PossessedExpectation {
 
     /* 狂人疑い */
     Map<Agent, Integer> posessedSuspectMap = new HashMap<>();
     /* 重複計算の回避リスト */
     List<String> flagList = new ArrayList<>();
 
-    public PosessedExpectation(GameInfo gameInfo) {
+    public PossessedExpectation(GameInfo gameInfo) {
         List<Agent> agentList = gameInfo.getAliveAgentList();   // 参加エージェント
         agentList.remove(gameInfo.getAgent()); // 自分自身は除く
         agentList.forEach(agent -> posessedSuspectMap.put(agent, 0));  // 狂人疑いマップを更新

@@ -204,6 +204,16 @@ public class BoardSurface {
     }
 
     /**
+     * 投票先発言を保管
+     * @param submit
+     * @param target
+     */
+    public void addVote(Agent submit, Agent target) {
+        PlayerInfo playerInfo = getPlayerInfo(submit);
+        playerInfo.addVoteList(target);
+    }
+
+    /**
      * 追放されたエージェントを保管
      * @param executedAgent
      */

@@ -104,7 +104,7 @@ public class WolfGroupExpectation {
             Map<Agent, Integer> duplicateAgentCount = new HashMap<>();
             duplicateAgentCount.merge(blackAgent, 1, Integer::sum); // 重複数を数える
             // blackListにいるエージェントの不信度 + 重複数を計算
-            int value = wolfGroupDistrustMap.get(blackAgent) + duplicateAgentCount.get(blackAgent);
+            int value = agentDistrustMap.get(blackAgent) + duplicateAgentCount.get(blackAgent);
             if (max_value < value) {
                 max_value = value;
                 blackAgentList.clear();

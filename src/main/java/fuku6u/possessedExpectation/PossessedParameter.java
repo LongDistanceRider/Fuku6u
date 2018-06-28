@@ -1,10 +1,10 @@
-package fuku6u.posessedExpectation;
+package fuku6u.possessedExpectation;
 
 /**
  * 狂人推定に用いるパラメータ
  * 値の更新をするためenumにはしない
  */
-public class PosessedParameter {
+public class PossessedParameter {
     private static int conviction_pose = 1000;    // 狂を確信
 
     private static int conviction_pose_wolf = 100; // ほぼ狂もしかしたら狼の可能性

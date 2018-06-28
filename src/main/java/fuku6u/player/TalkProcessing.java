@@ -3,7 +3,7 @@ package fuku6u.player;
 import fuku6u.board.BoardSurface;
 import fuku6u.log.Log;
 import fuku6u.observation.Observation;
-import fuku6u.posessedExpectation.PosessedExpectation;
+import fuku6u.possessedExpectation.PossessedExpectation;
 import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.client.lib.Content;
 import org.aiwolf.common.data.Talk;
@@ -19,7 +19,7 @@ public class TalkProcessing {
     private static int talkListHead = 0;
 
     // トークリストを全て保管することはせず，必要な要素を必要な形でBoardSurfaceに書き込む
-    public static void update(List<Talk> talkList, BoardSurface boardSurface, WolfGroupExpectation wExpect, PosessedExpectation pExpect) {
+    public static void update(List<Talk> talkList, BoardSurface boardSurface, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
         for (int i = talkListHead; i < talkList.size(); i++) {
             Talk talk = talkList.get(i);
             Log.info("Taker: " + talk.getAgent() + " mes: " + talk.getText());
@@ -54,8 +54,10 @@ public class TalkProcessing {
 //                    break;
 //                case GUARD:
 //                    break;
-//                case VOTE:
-//                    break;
+                case VOTE:
+                    Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget());
+                    boardSurface.addVote(talk.getAgent(), content.getTarget()); // 投票先発言を保管
+                    break;
 //                case ATTACK:
 //                    break;
 //            /* --- 同意・非同意に関する文 --- */

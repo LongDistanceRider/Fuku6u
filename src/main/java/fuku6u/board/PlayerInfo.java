@@ -22,6 +22,8 @@ class PlayerInfo {
     private boolean isAttacked = false;
     /* 追放されたか */
     private boolean isExecuted = false;
+    /* 投票先発言リスト */
+    private List<Agent> voteList = new ArrayList<>();
 
     public Agent getAgent() {
         return agent;
@@ -90,5 +92,14 @@ class PlayerInfo {
             if (coRole.equals(role)) return true;
         }
         return false;
+    }
+
+    /**
+     * 投票先発言を保管
+     * @param target
+     *  投票先エージェント
+     */
+    public void addVoteList(Agent target) {
+        voteList.add(target);
     }
 }

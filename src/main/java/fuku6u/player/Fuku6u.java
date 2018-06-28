@@ -3,7 +3,7 @@ package fuku6u.player;
 import fuku6u.board.BoardSurface;
 import fuku6u.log.Log;
 import fuku6u.observation.Observation;
-import fuku6u.posessedExpectation.PosessedExpectation;
+import fuku6u.possessedExpectation.PossessedExpectation;
 import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.client.lib.Content;
 import org.aiwolf.common.data.Agent;
@@ -12,7 +12,6 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,9 +24,7 @@ public class Fuku6u implements Player {
     /* 人狼グループ */
     private WolfGroupExpectation wolfGroupExpectation;
     /* 狂人予想 */
-    private PosessedExpectation posessedExpectation;
-    /* 発言リスト */
-    private static LinkedList<String> talkQueue = new LinkedList<>();
+    private PossessedExpectation posessedExpectation;
     /* finish()フラグ */
     private boolean isFinish = false;
 
@@ -37,6 +34,7 @@ public class Fuku6u implements Player {
         this.gameInfo = gameInfo;
         boardSurface = new BoardSurface(gameInfo);
         wolfGroupExpectation = new WolfGroupExpectation(gameInfo);
+        posessedExpectation = new PossessedExpectation(gameInfo);
         isFinish = false;
     }
 
@@ -161,9 +159,20 @@ public class Fuku6u implements Player {
         }
         if (isWerewolfSideWin) {
             Log.info("勝敗結果: 人狼陣営 勝利");
+            if (boardSurface.getAssignRole().getRole().equals(Role.WEREWOLF)) {
+                Log.info("勝ち");
+            } else {
+                Log.info("負け");
+            }
         } else {
             Log.info("勝敗結果: 村人陣営 勝利");
+            if (boardSurface.getAssignRole().getRole().equals(Role.WEREWOLF)) {
+                Log.info("負け");
+            } else {
+                Log.info("勝ち");
+            }
         }
+        isFinish = true;
         // ログ出力停止
         Log.endLog();
     }
