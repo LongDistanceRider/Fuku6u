@@ -51,7 +51,14 @@ public class Observation {
                     Utterance.getInstance().offer(Topic.ESTIMATE, seerCOAgent, Role.WEREWOLF);  // 「狼だと思う」
                     Utterance.getInstance().offer(Topic.ESTIMATE, seerCOAgent, Role.POSSESSED);  // 「狂人だと思う」
                     Utterance.getInstance().offer(Topic.VOTE, seerCOAgent); // 「VOTE発言」
-                    // TODO 真占い師が確定しているか確認する
+                    // 真占い師確定しているか
+                    if (checkGenuineSeer(bs, seerCOAgent)) {  // 確定
+                        bs.getComingOutAgentList(Role.SEER).forEach(agent -> {
+                            if (!agent.equals(seerCOAgent)) { // 偽物は削除
+                                findGenuineSeer(bs, wExpect, pExpect, agent);   // 真占い師処理
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -179,6 +186,7 @@ public class Observation {
                 Utterance.getInstance().offer(Topic.ESTIMATE, divEntry.getKey(), Role.VILLAGER);
             }
         }
+        // TODO 偽占い師の判定結果をリセットする必要がある
     }
 
     /**
