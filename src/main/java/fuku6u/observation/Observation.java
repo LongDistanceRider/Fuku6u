@@ -5,6 +5,7 @@ import fuku6u.log.Log;
 import fuku6u.player.Utterance;
 import fuku6u.possessedExpectation.PossessedExpectation;
 import fuku6u.possessedExpectation.PossessedParameter;
+import fuku6u.role.Seer;
 import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import fuku6u.wolfGroupExpectation.WolfGroupParameter;
 import org.aiwolf.client.lib.Topic;
@@ -32,6 +33,7 @@ public class Observation {
      * 観測対象: 襲撃されたプレイヤ
      * 処理対象: 襲撃されたプレイヤは人狼グループにいない
      *          襲撃されたプレイヤは黒出しされていたか
+     *          占霊狩COしたプレイヤは1人か（自分の役職が占霊狩の場合は除く）
      *
      * @param attackedAgent
      *  襲撃されたエージェント
@@ -62,6 +64,7 @@ public class Observation {
                 }
             }
         }
+        // TODO 占霊狩COしたプレイヤは1人か（自身が占霊狩の場合は除く）
     }
 
     /**
@@ -128,12 +131,17 @@ public class Observation {
     /**
      * 観測箇所: TalkProcessingのCOMINGOUT発言があった場合に呼び出される
      * 観測対象: 発言したエージェントと役職
-     * 処理対象: 占い師CO・霊能COしたエージェントが1人の場合は確定白としてグループから削除
-     *          自身が占い師の場合，霊能者の場合は，対抗は狂狼を確信
+     * 処理対象: 自身が占い師の場合，霊能者の場合は，対抗は狂狼を確信
      *          占い師または霊能が2人以上の場合は狂狼が混ざっているため，少し不信度をあげる？
      */
-    public static void comingout() {
-
+    public static void comingout(BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect, Agent submit, Role coRole) {
+        // 対抗COが存在するかを確認（占霊狩）
+        Role myRole = bs.getAssignRole().getRole();
+        if (myRole.equals(Role.SEER) || myRole.equals(Role.MEDIUM) || myRole.equals(Role.BODYGUARD)) {
+            if (myRole.equals(coRole)) {    // 対抗発見 => 狂狼を確信
+                wExpect.agentDistrustCalc(submit, PossessedParameter.getConviction_pose_wolf());
+            }
+        }
     }
 
     /**

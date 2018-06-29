@@ -34,6 +34,7 @@ public class TalkProcessing {
                 case COMINGOUT:
                     Log.debug("Taker: " + talk.getAgent() + " CO: " + content.getRole());
                     boardSurface.addComingoutRole(talk.getAgent(), content.getRole()); // CO役職を保管
+                    Observation.comingout(boardSurface, wExpect, pExpect, talk.getAgent(), content.getRole());
                     break;
                 case ESTIMATE:
                     break;
