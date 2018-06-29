@@ -1,6 +1,7 @@
 package fuku6u.player;
 
 import fuku6u.board.BoardSurface;
+import fuku6u.board.Util;
 import fuku6u.log.Log;
 import fuku6u.observation.Observation;
 import fuku6u.possessedExpectation.PossessedExpectation;
@@ -106,7 +107,7 @@ public class Fuku6u implements Player {
         Observation.vote(boardSurface);
         // 人狼予想グループクラスから，不信度の高いグループを取り出す
         List<Agent> blackList = wolfGroupExpectation.getBlackAgent();   // 投票すべきエージェントのリストを取得
-        Agent votedAgent = randomElementSelect(blackList);
+        Agent votedAgent = Util.randomElementSelect(blackList);
         Log.info("投票先: " + votedAgent);
         return votedAgent;
     }
@@ -124,7 +125,7 @@ public class Fuku6u implements Player {
         // TODO とりあえず占い候補から占う　意味のある占い候補を選ぶ必要がある
         List<Agent> candidateAgentList = boardSurface.getCandidateDivinedAgentList();
         if (!candidateAgentList.isEmpty()) {
-            return randomElementSelect(candidateAgentList);
+            return Util.randomElementSelect(candidateAgentList);
         }
         return null;
     }
@@ -193,15 +194,5 @@ public class Fuku6u implements Player {
         private
      */
 
-    /**
-     * リストから要素を一つランダムに返す
-     *
-     * @param list
-     * @param <T>
-     * @return
-     */
-    private <T> T randomElementSelect(List<T> list) {
-        if (list.isEmpty()) return null;
-        else return list.get((int) (Math.random() * list.size()));
-    }
+
 }

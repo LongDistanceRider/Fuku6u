@@ -5,7 +5,6 @@ import fuku6u.log.Log;
 import fuku6u.player.Utterance;
 import fuku6u.possessedExpectation.PossessedExpectation;
 import fuku6u.possessedExpectation.PossessedParameter;
-import fuku6u.role.Seer;
 import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import fuku6u.wolfGroupExpectation.WolfGroupParameter;
 import org.aiwolf.client.lib.Topic;
