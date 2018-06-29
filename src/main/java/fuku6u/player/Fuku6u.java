@@ -106,7 +106,9 @@ public class Fuku6u implements Player {
         Observation.vote(boardSurface);
         // 人狼予想グループクラスから，不信度の高いグループを取り出す
         List<Agent> blackList = wolfGroupExpectation.getBlackAgent();   // 投票すべきエージェントのリストを取得
-        return randomElementSelect(blackList);
+        Agent votedAgent = randomElementSelect(blackList);
+        Log.info("投票先: " + votedAgent);
+        return votedAgent;
     }
 
     @Override
@@ -173,6 +175,10 @@ public class Fuku6u implements Player {
                 Log.info("勝ち");
             }
         }
+
+        // ----- デバックログ出力開始 -----
+
+        // -----  -----
         isFinish = true;
         // ログ出力停止
         Log.endLog();

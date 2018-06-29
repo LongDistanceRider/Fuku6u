@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public class Observation {
 
+    // TODO 黒を確信したエージェントに対して白を出しているエージェントは偽物
     /**
      * 観測箇所: dayStart()の終わりに呼び出される
      * 観測対象: 襲撃されたプレイヤ
@@ -139,7 +140,11 @@ public class Observation {
         Role myRole = bs.getAssignRole().getRole();
         if (myRole.equals(Role.SEER) || myRole.equals(Role.MEDIUM) || myRole.equals(Role.BODYGUARD)) {
             if (myRole.equals(coRole)) {    // 対抗発見 => 狂狼を確信
-                wExpect.agentDistrustCalc(submit, PossessedParameter.getConviction_pose_wolf());
+                wExpect.agentDistrustCalc(submit, WolfGroupParameter.getConviction_PoseWolf());
+                pExpect.addAgentSuspect(submit, PossessedParameter.getConviction_pose_wolf());
+                Utterance.getInstance().offer(Topic.ESTIMATE, submit, Role.POSSESSED);  // 「狂人だと思う」
+                Utterance.getInstance().offer(Topic.ESTIMATE, submit, Role.WEREWOLF);   // 「人狼だと思う」
+                Utterance.getInstance().offer(Topic.VOTE, submit);  // 「submitに投票する」
             }
         }
     }
@@ -206,6 +211,7 @@ public class Observation {
      *  真占い師が発見された場合のみtrueを返す．
      */
     private static boolean checkGenuineSeer(BoardSurface bs, Agent fakeSeer) {
+        // TODO この書き方だと占い師3人いたチキに対応できない
         if (bs.getAssignRole().getRole().equals(Role.SEER)) {
             return false;
         }

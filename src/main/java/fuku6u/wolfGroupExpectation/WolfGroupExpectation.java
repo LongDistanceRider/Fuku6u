@@ -14,8 +14,6 @@ public class WolfGroupExpectation {
     private Map<WolfGroup, Boolean> isWolfGroupMap = new HashMap<>();
     /* WolfGroupの不信度 */
     private Map<WolfGroup, Integer> wolfGroupDistrustMap = new HashMap<>();
-    /* Agentの灰・黒可能性フラグ（各白はfalse） */ // TODO このリスト必要ないかも　要検討
-    private Map<Agent, Boolean> isAgentDistrustMap = new HashMap<>();
     /* エージェントの不信度 */
     private Map<Agent, Integer> agentDistrustMap = new HashMap<>();
     /* 重複計算の回避リスト */
@@ -41,7 +39,6 @@ public class WolfGroupExpectation {
                     wolfGroupDistrustMap.put(wolfGroup, 0);
                 }
             }
-            isAgentDistrustMap.put(agentList.get(i), Boolean.TRUE);   // フラグ初期化
             agentDistrustMap.put(agentList.get(i), 0);
         }
     }
@@ -170,5 +167,13 @@ public class WolfGroupExpectation {
         }
         value += wolfGroupDistrustMap.get(wolfGroup);
         return value;
+    }
+
+    /**
+     * デバックログを出力
+     */
+    public void debugLog() {
+        // 生存グループ出力とグループ評価値を返す
+
     }
 }
