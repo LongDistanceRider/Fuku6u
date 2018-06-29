@@ -75,8 +75,10 @@ public class WolfGroupExpectation {
      */
     public void deleteGroup(Agent whiteAgent) {
         isWolfGroupMap.forEach(((wolfGroup, boo) -> {
-            if (wolfGroup.inAgent(whiteAgent)) {
-                isWolfGroupMap.put(wolfGroup, Boolean.FALSE);
+            if (boo) {
+                if (wolfGroup.inAgent(whiteAgent)) {
+                    isWolfGroupMap.put(wolfGroup, Boolean.FALSE);
+                }
             }
         }));
     }

@@ -1,7 +1,9 @@
 package fuku6u.role;
 
 import fuku6u.board.BoardSurface;
+import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.common.data.Role;
+import org.aiwolf.common.net.GameInfo;
 
 public class Villager extends AbstractRole {
 
@@ -11,7 +13,7 @@ public class Villager extends AbstractRole {
     }
 
     @Override
-    public void dayStart(BoardSurface boardSurface) {
+    public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect) {
 
     }
 

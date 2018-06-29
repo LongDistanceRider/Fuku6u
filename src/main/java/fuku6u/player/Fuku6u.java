@@ -58,6 +58,7 @@ public class Fuku6u implements Player {
                 return;
             case 1: // 1日目
                 boardSurface.setAssignRole(gameInfo.getRole());  // 役職セット
+                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wolfGroupExpectation);    // 役職固有の処理
                 break;
             default: // 2日目以降
                 // 被投票者
@@ -79,7 +80,7 @@ public class Fuku6u implements Player {
                 } else {
                     Log.info("被害者 : なし（GJ発生）");
                 }
-                boardSurface.getAssignRole().dayStart(boardSurface);    // 役職固有の処理
+                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wolfGroupExpectation);    // 役職固有の処理
                 Observation.dayStart(boardSurface, wolfGroupExpectation, posessedExpectation, attackedAgent);  // 観測
         }
 

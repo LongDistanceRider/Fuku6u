@@ -57,6 +57,14 @@ public class BoardSurface {
         return me;
     }
 
+    public void putDivinedResultMap(Agent target, Species result) {
+        divinedResultMap.put(target, result);
+    }
+
+    public Map<Agent, Species> getDivinedResultMap() {
+        return divinedResultMap;
+    }
+
     public BoardSurface(GameInfo gameInfo) {
         this.me = gameInfo.getAgent();
         for (Agent agent :
@@ -292,6 +300,8 @@ public class BoardSurface {
         }
         return yetDivinedAgentList;
     }
+
+
 }
 
 

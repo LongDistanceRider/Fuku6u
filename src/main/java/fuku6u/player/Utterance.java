@@ -1,9 +1,11 @@
 package fuku6u.player;
 
+import com.sun.xml.internal.xsom.impl.Ref;
 import fuku6u.log.Log;
 import org.aiwolf.client.lib.*;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
+import org.aiwolf.common.data.Species;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -25,6 +27,21 @@ public class Utterance {
      * プロトコル発言生成を担うメソッド
      * @param topic
      * @param target
+     * @param species
+     */
+    public void offer(Topic topic, Agent target, Species species) {
+        switch (topic) {
+            case DIVINED:
+                ContentBuilder builder = new DivinedResultContentBuilder(target, species);
+                offer(new Content(builder).getText());
+                return;
+        }
+    }
+
+    /**
+     * プロトコル発言生成を担うメソッド
+     * @param topic
+     * @param target
      * @param role
      */
     public void offer(Topic topic, Agent target, Role role) {
@@ -32,6 +49,10 @@ public class Utterance {
             case ESTIMATE:
                 ContentBuilder builder = new EstimateContentBuilder(target, role);
                 offer(new Content(builder).getText());
+                return;
+            case COMINGOUT:
+                ContentBuilder builder2 = new ComingoutContentBuilder(target, role);
+                offer(new Content(builder2).getText());
                 return;
         }
     }

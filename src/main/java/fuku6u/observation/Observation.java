@@ -164,7 +164,7 @@ public class Observation {
             case "1-3":
                 break;
             default:
-                Log.debug("想定していない進行を確認");
+                Log.debug("想定していない進行を確認:" + progress);
         }
 
     }
