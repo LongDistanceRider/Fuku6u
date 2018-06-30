@@ -25,7 +25,7 @@ public class Fuku6u implements Player {
     /* 人狼グループ */
     private WolfGroupExpectation wolfGroupExpectation;
     /* 狂人予想 */
-    private PossessedExpectation posessedExpectation;
+    private PossessedExpectation possessedExpectation;
     /* finish()フラグ */
     private boolean isFinish = false;
 
@@ -35,7 +35,7 @@ public class Fuku6u implements Player {
         this.gameInfo = gameInfo;
         boardSurface = new BoardSurface(gameInfo);
         wolfGroupExpectation = new WolfGroupExpectation(gameInfo);
-        posessedExpectation = new PossessedExpectation(gameInfo);
+        possessedExpectation = new PossessedExpectation(gameInfo);
         isFinish = false;
     }
 
@@ -44,7 +44,7 @@ public class Fuku6u implements Player {
         Log.debug("update()実行");
         this.gameInfo = gameInfo;
         // 発言処理
-        TalkProcessing.update(gameInfo.getTalkList(), boardSurface, wolfGroupExpectation, posessedExpectation);
+        TalkProcessing.update(gameInfo.getTalkList(), boardSurface, wolfGroupExpectation, possessedExpectation);
     }
 
     @Override
@@ -58,15 +58,17 @@ public class Fuku6u implements Player {
             case 0: // 0日目
                 return;
             case 1: // 1日目
-                boardSurface.setAssignRole(gameInfo.getRole());  // 役職セット
-                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wolfGroupExpectation);    // 役職固有の処理
+                // 役職セット
+                boardSurface.setAssignRole(gameInfo.getRole());
+                // 役職固有の処理
+                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wolfGroupExpectation);
                 break;
             default: // 2日目以降
                 // 被投票者
                 Agent executedAgent = gameInfo.getExecutedAgent();
                 boardSurface.executedAgent(executedAgent);  // 追放されたエージェントを保管
                 Log.info("追放者: " + executedAgent);
-                // 被噛み　null の場合はGJ発生
+                // 被害者
                 Agent attackedAgent = null;
                 for (Agent agent :
                         gameInfo.getLastDeadAgentList()) {  // 狐がいると2人返ってくると思われるため，この処理のままにしておく
@@ -82,9 +84,8 @@ public class Fuku6u implements Player {
                     Log.info("被害者 : なし（GJ発生）");
                 }
                 boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wolfGroupExpectation);    // 役職固有の処理
-                Observation.dayStart(boardSurface, wolfGroupExpectation, posessedExpectation, attackedAgent);  // 観測
+                Observation.dayStart(boardSurface, wolfGroupExpectation, possessedExpectation, attackedAgent);  // 観測
         }
-
     }
 
     @Override
@@ -133,8 +134,12 @@ public class Fuku6u implements Player {
     @Override
     public Agent guard() {
         Log.debug("guard()実行");
-        // TODO ガード先は○-○進行によって変える必要がある．
-        return null;
+        // TODO ガード先は○-○進行によって変える必要がある．とりあえず適当に処理書いておく
+        List<Agent> candidates = gameInfo.getAliveAgentList();
+        candidates.remove(boardSurface.getMe());
+        Agent guardedAgent = Util.randomElementSelect(candidates);
+        Log.info("護衛先: " + guardedAgent);
+        return guardedAgent;
     }
 
     @Override

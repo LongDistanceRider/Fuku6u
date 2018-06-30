@@ -6,6 +6,7 @@ import fuku6u.role.Villager;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
+import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class BoardSurface {
     private Map<Agent, Species> mediumResultMap = new HashMap<>();
     /* PlayerInfoリスト（自分自身は除く） */
     private List<PlayerInfo> playerInfoList = new ArrayList<>();
+    /* Talkリスト */
+    private List<Talk> talkList = new ArrayList<>();
 
     public void setAssignRole(Role role) {
         Log.info("MyRole: " + role);
@@ -70,6 +73,10 @@ public class BoardSurface {
         return divinedResultMap;
     }
 
+    public void addTalk(Talk talk) {
+        talkList.add(talk);
+    }
+
     public BoardSurface(GameInfo gameInfo) {
         this.me = gameInfo.getAgent();
         for (Agent agent :
@@ -78,7 +85,7 @@ public class BoardSurface {
             playerInfoList.add(new PlayerInfo(agent));
         }
     }
-    
+
     /*
         情報加工
      */
@@ -100,7 +107,6 @@ public class BoardSurface {
         });
         return candidateAgentList;
     }
-
     /**
      * ある役職をカミングアウトしたエージェントのリストを返す
      *
@@ -121,6 +127,7 @@ public class BoardSurface {
         }
         return comingoutAgentList;
     }
+
     /**
      * あるエージェントが発言した占い結果を返す
      *
@@ -174,7 +181,6 @@ public class BoardSurface {
         return whiteDivinedAgentList;
     }
 
-
     /*
         PlayerInfo操作
      */
@@ -186,6 +192,7 @@ public class BoardSurface {
     public void addComingoutRole (Agent agent, Role role) {
         getPlayerInfo(agent).addComingoutRole(role);
     }
+
     /**
      * 占い結果を保管
      * @param agent
@@ -241,10 +248,10 @@ public class BoardSurface {
     public void attackedAgent(Agent attackedAgent) {
         getPlayerInfo(attackedAgent).setAttacked(true);
     }
-
     /*
         private
      */
+
     /**
      * プレイヤー情報リストからプレイヤー情報のインスタンスを返す
      * @param agent 欲しいプレイヤー情報
@@ -305,7 +312,6 @@ public class BoardSurface {
         }
         return yetDivinedAgentList;
     }
-
 
 }
 

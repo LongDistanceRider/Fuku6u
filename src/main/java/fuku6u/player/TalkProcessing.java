@@ -18,7 +18,7 @@ public class TalkProcessing {
     /* トークリストをどこまで読み込んだか */
     private static int talkListHead = 0;
 
-    // トークリストを全て保管することはせず，必要な要素を必要な形でBoardSurfaceに書き込む
+    // 必要な要素を必要な形でBoardSurfaceに書き込む AGREE DISAGREEのためにTalkを全て保管
     public static void update(List<Talk> talkList, BoardSurface boardSurface, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
         for (int i = talkListHead; i < talkList.size(); i++) {
             Talk talk = talkList.get(i);
@@ -26,6 +26,8 @@ public class TalkProcessing {
             if (talk.getAgent().equals(boardSurface.getMe())) {  // 自分自身の発言はスキップ
                 continue;
             }
+            // Talkを保管
+            boardSurface.addTalk(talk);
             // String text を Contentに変換する
             Content content = new Content(talk.getText());
             // ラベルごとに処理
@@ -80,11 +82,5 @@ public class TalkProcessing {
 //            Log.info(">> " + talk.getAgent() + " : " + talk.getText());
         }
         talkListHead = talkList.size();
-    }
-
-    public static void finish() {
-        // TODO 2回対戦を回して，talkListHeadをリセットしていいかを確認する
-        Log.trace("ゲーム終了時，発言リストサイズ" + talkListHead);
-        talkListHead = 0;
     }
 }
