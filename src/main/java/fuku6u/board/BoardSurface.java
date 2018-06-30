@@ -21,6 +21,8 @@ public class BoardSurface {
     private AbstractRole assignRole = null;
     /* 占い結果 */
     Map<Agent, Species> divinedResultMap = new HashMap<>();
+    /* 霊能結果 */
+    private Map<Agent, Species> mediumResultMap = new HashMap<>();
     /* PlayerInfoリスト（自分自身は除く） */
     private List<PlayerInfo> playerInfoList = new ArrayList<>();
 
@@ -61,6 +63,9 @@ public class BoardSurface {
         divinedResultMap.put(target, result);
     }
 
+    public void putMediumResultMap(Agent target, Species result) {
+        mediumResultMap.put(target, result);
+    }
     public Map<Agent, Species> getDivinedResultMap() {
         return divinedResultMap;
     }
