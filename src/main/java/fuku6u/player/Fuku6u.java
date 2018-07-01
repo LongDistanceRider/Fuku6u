@@ -4,17 +4,18 @@ import fuku6u.board.BoardSurface;
 import fuku6u.board.Util;
 import fuku6u.log.Log;
 import fuku6u.observation.Observation;
+import fuku6u.observer.DayStartObserver;
+import fuku6u.observer.Observer;
 import fuku6u.possessedExpectation.PossessedExpectation;
 import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.client.lib.Content;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Player;
 import org.aiwolf.common.data.Role;
+import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
-
 import java.util.List;
-import java.util.Map;
 
 public class Fuku6u implements Player {
 
@@ -23,19 +24,21 @@ public class Fuku6u implements Player {
     /* 盤面 */
     private BoardSurface boardSurface;
     /* 人狼グループ */
-    private WolfGroupExpectation wolfGroupExpectation;
+    private WolfGroupExpectation wExpect;
     /* 狂人予想 */
-    private PossessedExpectation possessedExpectation;
+    private PossessedExpectation pExpect;
     /* finish()フラグ */
     private boolean isFinish = false;
+    /* トークリストをどこまで読み込んだか */
+    private static int talkListHead = 0;
 
     @Override
     public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
         Log.debug("initialize()実行");
         this.gameInfo = gameInfo;
         boardSurface = new BoardSurface(gameInfo);
-        wolfGroupExpectation = new WolfGroupExpectation(gameInfo);
-        possessedExpectation = new PossessedExpectation(gameInfo);
+        wExpect = new WolfGroupExpectation(gameInfo);
+        pExpect = new PossessedExpectation(gameInfo);
         isFinish = false;
     }
 
@@ -44,7 +47,7 @@ public class Fuku6u implements Player {
         Log.debug("update()実行");
         this.gameInfo = gameInfo;
         // 発言処理
-        TalkProcessing.update(gameInfo.getTalkList(), boardSurface, wolfGroupExpectation, possessedExpectation);
+        talkProcessing();
     }
 
     @Override
@@ -61,7 +64,7 @@ public class Fuku6u implements Player {
                 // 役職セット
                 boardSurface.setAssignRole(gameInfo.getRole());
                 // 役職固有の処理
-                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wolfGroupExpectation);
+                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wExpect);
                 break;
             default: // 2日目以降
                 // 被投票者
@@ -83,8 +86,11 @@ public class Fuku6u implements Player {
                 } else {
                     Log.info("被害者 : なし（GJ発生）");
                 }
-                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wolfGroupExpectation);    // 役職固有の処理
-                Observation.dayStart(boardSurface, wolfGroupExpectation, possessedExpectation, attackedAgent);  // 観測
+                // 役職固有の処理
+                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wExpect);
+                // 観測クラスの実行
+                DayStartObserver observer = new DayStartObserver(gameInfo, boardSurface, wExpect, pExpect);
+                observer.check(attackedAgent);
         }
     }
 
@@ -107,7 +113,7 @@ public class Fuku6u implements Player {
         Log.debug("vote()実行");
         Observation.vote(boardSurface);
         // 人狼予想グループクラスから，不信度の高いグループを取り出す
-        List<Agent> blackList = wolfGroupExpectation.getBlackAgent();   // 投票すべきエージェントのリストを取得
+        List<Agent> blackList = wExpect.getBlackAgent();   // 投票すべきエージェントのリストを取得
         Agent votedAgent = Util.randomElementSelect(blackList);
         Log.info("投票先: " + votedAgent);
         return votedAgent;
@@ -154,7 +160,6 @@ public class Fuku6u implements Player {
         boardSurface.getAssignRole().finish(boardSurface);
 
         // 参加プレイヤのリザルト出力
-        Map<Agent, Role> agentMap = gameInfo.getRoleMap();
         gameInfo.getRoleMap().forEach((agent, role) -> Log.info(agent + " Role: " + role));
 
         // 勝敗を出力
@@ -199,5 +204,69 @@ public class Fuku6u implements Player {
         private
      */
 
-
+    private void talkProcessing() {
+        List<Talk> talkList = gameInfo.getTalkList();
+        for (int i = talkListHead; i < talkList.size(); i++) {
+            Talk talk = talkList.get(i);
+            Log.info("Taker: " + talk.getAgent() + " mes: " + talk.getText());
+            if (talk.getAgent().equals(boardSurface.getMe())) {  // 自分自身の発言はスキップ
+                continue;
+            }
+            // Talkを保管
+            boardSurface.addTalk(talk);
+            // String text を Contentに変換する
+            Content content = new Content(talk.getText());
+            // ラベルごとに処理
+            switch (content.getTopic()) {
+            /* --- 意図表明に関する文 --- */
+                case COMINGOUT:
+                    Log.debug("Taker: " + talk.getAgent() + " CO: " + content.getRole());
+                    boardSurface.addComingoutRole(talk.getAgent(), content.getRole()); // CO役職を保管
+                    Observation.comingout(boardSurface, wExpect, pExpect, talk.getAgent(), content.getRole());
+                    break;
+                case ESTIMATE:
+                    break;
+            /* --- 能力結果に関する文 --- */
+                case DIVINED:
+                    Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget() + " DIV: " + content.getResult());
+                    boardSurface.addDivMap(talk.getAgent(), content.getTarget(), content.getResult()); // 占い結果を保管
+                    Observation.divined(boardSurface, wExpect, pExpect, talk.getAgent(), content.getTarget(), content.getResult());
+                    break;
+                case IDENTIFIED:
+                    Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget() + " DIV: " + content.getResult());
+                    boardSurface.addIdenMap(talk.getAgent(), content.getTarget(), content.getResult()); // 霊能結果を保管
+                    break;
+//                case GUARDED:
+//                    break;
+//            /* --- ルール行動・能力に関する文 --- */
+//                case DIVINATION:
+//                    break;
+//                case GUARD:
+//                    break;
+                case VOTE:
+                    Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget());
+                    boardSurface.addVote(talk.getAgent(), content.getTarget()); // 投票先発言を保管
+                    break;
+//                case ATTACK:
+//                    break;
+//            /* --- 同意・非同意に関する文 --- */
+//                case AGREE:
+//                    break;
+//                case DISAGREE:
+//                    break;
+//            /* --- 発話制御に関する文 --- */
+//                case OVER:
+//                    break;
+//                case SKIP:
+//                    break;
+//            /* --- REQUEST文 --- */
+//                case OPERATOR:
+//                    break;
+                default:
+                    break;
+            }
+//            Log.info(">> " + talk.getAgent() + " : " + talk.getText());
+        }
+        talkListHead = talkList.size();
+    }
 }

@@ -138,6 +138,10 @@ public class BoardSurface {
         return getPlayerInfo(submit).getDivMap();
     }
 
+    public Map<Agent,Species> getIdenResult(Agent submit) {
+        return getPlayerInfo(submit).getIdenMap();
+    }
+
     /**
      * 黒判定を出されたエージェントのリストを返す
      *
@@ -312,6 +316,7 @@ public class BoardSurface {
         }
         return yetDivinedAgentList;
     }
+
 
 }
 

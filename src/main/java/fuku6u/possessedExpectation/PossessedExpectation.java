@@ -15,13 +15,26 @@ public class PossessedExpectation {
 
     /* 狂人疑い */
     Map<Agent, Integer> posessedSuspectMap = new HashMap<>();
+    /* 灰色boolean */
+    Map<Agent, Boolean> suspectMap = new HashMap<>();
     /* 重複計算の回避リスト */
     List<String> flagList = new ArrayList<>();
+
+    /**
+     * 容疑が晴れる
+     * @param agent
+     */
+    public void clearAgent(Agent agent) {
+        suspectMap.put(agent, Boolean.FALSE);
+    }
 
     public PossessedExpectation(GameInfo gameInfo) {
         List<Agent> agentList = gameInfo.getAliveAgentList();   // 参加エージェント
         agentList.remove(gameInfo.getAgent()); // 自分自身は除く
-        agentList.forEach(agent -> posessedSuspectMap.put(agent, 0));  // 狂人疑いマップを更新
+        agentList.forEach(agent -> {
+            posessedSuspectMap.put(agent, 0);
+            suspectMap.put(agent, Boolean.TRUE);
+        });  // 狂人疑いマップを更新
     }
 
     /**

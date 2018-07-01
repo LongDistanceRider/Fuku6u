@@ -28,44 +28,6 @@ import java.util.Map;
 public class Observation {
 
     // TODO 黒を確信したエージェントに対して白を出しているエージェントは偽物
-    /**
-     * 観測箇所: dayStart()の終わりに呼び出される
-     * 観測対象: 襲撃されたプレイヤ
-     * 処理対象: 襲撃されたプレイヤは人狼グループにいない
-     *          襲撃されたプレイヤは黒出しされていたか
-     *          占霊狩COしたプレイヤは1人か（自分の役職が占霊狩の場合は除く）
-     *
-     * @param attackedAgent
-     *  襲撃されたエージェント
-     */
-    public static void dayStart(BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect, Agent attackedAgent) {
-        // 襲撃されたプレイヤは人狼グループにいない => グループから削除
-        wExpect.deleteGroup(attackedAgent);
-        // 占い師が黒出ししたプレイヤが襲撃された =>　占い師は偽物　=> 狂狼の可能性が高い（特に狂人）（人狼がやる行動ではないがプロトコル部門ではあり得るのでは）
-        for (Agent seerCOAgent :
-                bs.getComingOutAgentList(Role.SEER)) {  // 占い師COしたエージェント
-            for (Map.Entry<Agent, Species> divinedResult:
-                 bs.getDivinedResult(seerCOAgent).entrySet()) { // 占い結果
-                if (divinedResult.getKey().equals(attackedAgent) && divinedResult.getValue().equals(Species.WEREWOLF)) {    // 襲撃されたプレイヤに対して黒判定を出していた場合
-                    wExpect.agentDistrustCalc(seerCOAgent, WolfGroupParameter.getConviction_PoseWolf());   // 狂狼を確信
-                    pExpect.addAgentSuspect(seerCOAgent, PossessedParameter.getConviction_pose_wolf());  // ほぼ狂もしかしたら狼を確信
-
-                    Utterance.getInstance().offer(Topic.ESTIMATE, seerCOAgent, Role.WEREWOLF);  // 「狼だと思う」
-                    Utterance.getInstance().offer(Topic.ESTIMATE, seerCOAgent, Role.POSSESSED);  // 「狂人だと思う」
-                    Utterance.getInstance().offer(Topic.VOTE, seerCOAgent); // 「VOTE発言」
-                    // 真占い師確定しているか
-                    if (checkGenuineSeer(bs, seerCOAgent)) {  // 確定
-                        bs.getComingOutAgentList(Role.SEER).forEach(agent -> {
-                            if (!agent.equals(seerCOAgent)) { // 偽物は削除
-                                findGenuineSeer(bs, wExpect, pExpect, agent);   // 真占い師処理
-                            }
-                        });
-                    }
-                }
-            }
-        }
-        // TODO 占霊狩COしたプレイヤは1人か（自身が占霊狩の場合は除く）
-    }
 
     /**
      * 観測箇所: TalkProcessingのDIVINED発言があった後に呼び出される
