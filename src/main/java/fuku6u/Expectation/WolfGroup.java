@@ -1,4 +1,4 @@
-package fuku6u.wolfGroupExpectation;
+package fuku6u.Expectation;
 
 import org.aiwolf.common.data.Agent;
 

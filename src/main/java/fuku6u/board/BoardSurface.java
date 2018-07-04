@@ -1,8 +1,7 @@
 package fuku6u.board;
 
 import fuku6u.log.Log;
-import fuku6u.role.AbstractRole;
-import fuku6u.role.Villager;
+import fuku6u.role.*;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
@@ -26,32 +25,41 @@ public class BoardSurface {
     private Map<Agent, Species> mediumResultMap = new HashMap<>();
     /* PlayerInfoリスト（自分自身は除く） */
     private List<PlayerInfo> playerInfoList = new ArrayList<>();
+    /* 人狼メンバーリスト */
+    List<Agent> werewolfList = new ArrayList<>();
     /* Talkリスト */
     private List<Talk> talkList = new ArrayList<>();
 
-    public void setAssignRole(Role role) {
+    public void setAssignRole(GameInfo gameInfo) {
+        Role role = gameInfo.getRole();
         Log.info("MyRole: " + role);
         // TODO しばらく役職は村人固定　随時追加
-        assignRole = new Villager();
-//        switch (role) {
-//            case SEER:
-//                assignRole = new Seer(gameInfo);
-//                break;
-//            case MEDIUM:
-//                assignRole = new Medium(gameInfo);
-//                break;
-//            case BODYGUARD:
-//                assignRole = new Bodyguard(gameInfo);
-//                break;
-//            case POSSESSED:
-//                assignRole = new Possessed(gameInfo);
-//                break;
-//            case WEREWOLF:
-//                assignRole = new Werewolf(gameInfo);
-//                break;
-//            default:
-//                assignRole = new Villager(gameInfo);
-//        }
+        switch (role) {
+            case SEER:
+                assignRole = new Seer();
+                break;
+            case MEDIUM:
+                assignRole = new Medium();
+                break;
+            case BODYGUARD:
+                assignRole = new Bodyguard();
+                break;
+            case POSSESSED:
+                assignRole = new Possessed();
+                break;
+            case WEREWOLF:
+                assignRole = new Werewolf();
+                // 人狼メンバーを追加
+                Map<Agent, Role> roleMap = gameInfo.getRoleMap();
+                roleMap.forEach(((agent, assignRole) -> {
+                    if (!agent.equals(gameInfo.getAgent()) && assignRole.equals(Role.WEREWOLF)) {
+                        werewolfList.add(agent);
+                    }
+                }));
+                break;
+            default:
+                assignRole = new Villager();
+        }
     }
 
     public AbstractRole getAssignRole() {
@@ -71,6 +79,10 @@ public class BoardSurface {
     }
     public Map<Agent, Species> getDivinedResultMap() {
         return divinedResultMap;
+    }
+
+    public List<Agent> getWerewolfList() {
+        return werewolfList;
     }
 
     public void addTalk(Talk talk) {
@@ -97,6 +109,7 @@ public class BoardSurface {
      * @return
      */
     public List<Agent> getCandidateDivinedAgentList () {
+        // TODO .role.Seerへ移行
         List<Agent> candidateAgentList = new ArrayList<>();
         List<Agent> yetDivinedAgentList = getYetDivinedAgentList();
         List<Agent> aliveAgentList = getAliveAgentList();

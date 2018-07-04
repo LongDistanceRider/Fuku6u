@@ -1,16 +1,13 @@
 package fuku6u.observer;
 
+import fuku6u.Expectation.PossessedExpectation;
+import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.player.Utterance;
-import fuku6u.possessedExpectation.PossessedExpectation;
-import fuku6u.possessedExpectation.PossessedParameter;
-import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
-import org.aiwolf.common.net.GameInfo;
-import org.aiwolf.common.net.GameSetting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +24,7 @@ public abstract class Observer {
     /* 偽霊COをしているエージェントを保管 */
     protected static List<Agent> lieMediumAgentList = new ArrayList<>();
 
+
     /**
      * 真占い師を観測した場合の処理をまとめる
      */
@@ -35,13 +33,12 @@ public abstract class Observer {
         for (Map.Entry<Agent, Species> divEntry :
                 divinedResultMap.entrySet()) {
             if (divEntry.getValue().equals(Species.WEREWOLF)) { // 黒出しエージェント発見
-                wExpect.remainGroup(divEntry.getKey()); // 人狼確定
-                pExpect.addAgentSuspect(divEntry.getKey(), PossessedParameter.getConviction_wolf());
+                wExpect.convictionAgent(divEntry.getKey()); // 人狼確定
+                pExpect.clearAgent(divEntry.getKey());
                 Utterance.getInstance().offer(Topic.ESTIMATE, divEntry.getKey(), Role.WEREWOLF);
                 Utterance.getInstance().offer(Topic.VOTE, divEntry.getKey());
             } else {    // 白だしエージェント発見
-                wExpect.deleteGroup(divEntry.getKey());
-                Utterance.getInstance().offer(Topic.ESTIMATE, divEntry.getKey(), Role.VILLAGER);
+                wExpect.clearAgent(divEntry.getKey());
             }
         }
         // TODO 偽占い師の判定結果をリセットする必要がある

@@ -1,15 +1,16 @@
 package fuku6u.role;
 
+import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.board.Util;
 import fuku6u.player.Utterance;
-import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
 import org.aiwolf.common.net.GameInfo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,8 @@ public class Werewolf extends AbstractRole {
 
     /* 占い結果 */
     Map<Agent, Species> divinedMap = new HashMap<>();
+    /* 人狼メンバー */
+    List<Agent> werewolfList = new ArrayList<>();
 
     @Override
     public Role getRole() {
@@ -42,6 +45,10 @@ public class Werewolf extends AbstractRole {
         divinedMap.put(target, Species.HUMAN);
         // 占い結果を発言
         Utterance.getInstance().offer(Topic.DIVINED, target, Species.HUMAN);    // 「targetを占った結果白だった」
+        String str = "1";
+        for (int i = 0; i < Integer.parseInt(str); i++) {
+
+        }
     }
 
     @Override
@@ -52,5 +59,24 @@ public class Werewolf extends AbstractRole {
     @Override
     public void finish(BoardSurface boardSurface) {
 
+    }
+
+    @Override
+    public List<Agent> vote(List<Agent> candidateAgentList, WolfGroupExpectation wExpect) {
+        // TODO 人狼用に書き換えること
+        int maxDistrust = 0;
+        List<Agent> mostDistrustAgentList = null;
+        for (Agent agent :
+                candidateAgentList) {
+            int distrust = wExpect.getAgentDistrust(agent);
+            if (distrust > maxDistrust) {
+                mostDistrustAgentList.clear();
+                maxDistrust = distrust;
+            }
+            if (distrust == maxDistrust) {
+                mostDistrustAgentList.add(agent);
+            }
+        }
+        return mostDistrustAgentList;
     }
 }

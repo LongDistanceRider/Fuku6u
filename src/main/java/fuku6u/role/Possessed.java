@@ -1,9 +1,9 @@
 package fuku6u.role;
 
+import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.board.Util;
 import fuku6u.player.Utterance;
-import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
@@ -49,5 +49,24 @@ public class Possessed extends AbstractRole {
     @Override
     public void finish(BoardSurface boardSurface) {
 
+    }
+
+    @Override
+    public List<Agent> vote(List<Agent> candidateAgentList, WolfGroupExpectation wExpect) {
+        // 狂人ように書き換えること
+        int maxDistrust = 0;
+        List<Agent> mostDistrustAgentList = null;
+        for (Agent agent :
+                candidateAgentList) {
+            int distrust = wExpect.getAgentDistrust(agent);
+            if (distrust > maxDistrust) {
+                mostDistrustAgentList.clear();
+                maxDistrust = distrust;
+            }
+            if (distrust == maxDistrust) {
+                mostDistrustAgentList.add(agent);
+            }
+        }
+        return mostDistrustAgentList;
     }
 }

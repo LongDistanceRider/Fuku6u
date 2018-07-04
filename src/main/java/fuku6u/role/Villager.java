@@ -1,7 +1,7 @@
 package fuku6u.role;
 
+import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
-import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.net.GameInfo;
 

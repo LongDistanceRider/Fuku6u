@@ -1,8 +1,8 @@
 package fuku6u.role;
 
+import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.player.Utterance;
-import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Judge;
@@ -30,9 +30,9 @@ public class Medium extends AbstractRole {
 
             // 判定によって人狼グループ予想クラスの処理をする
             if (result.equals(Species.HUMAN)) {
-                wExpect.deleteGroup(target);
+                wExpect.clearAgent(target);
             } else {
-                wExpect.remainGroup(target);
+                wExpect.convictionAgent(target);
             }
         }
     }

@@ -103,7 +103,7 @@ class PlayerInfo {
         voteList.add(target);
     }
 
-    public Map<Agent,Species> getIdenMap() {
+    public Map<Agent, Species> getIdenMap() {
         return idenMap;
     }
 }

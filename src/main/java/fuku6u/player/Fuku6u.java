@@ -1,13 +1,13 @@
 package fuku6u.player;
 
+import fuku6u.Expectation.PossessedExpectation;
+import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.board.Util;
 import fuku6u.log.Log;
-import fuku6u.observation.Observation;
 import fuku6u.observer.DayStartObserver;
-import fuku6u.observer.Observer;
-import fuku6u.possessedExpectation.PossessedExpectation;
-import fuku6u.wolfGroupExpectation.WolfGroupExpectation;
+import fuku6u.observer.TalkEndObserver;
+import fuku6u.observer.TalkObserver;
 import org.aiwolf.client.lib.Content;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Player;
@@ -38,7 +38,7 @@ public class Fuku6u implements Player {
         this.gameInfo = gameInfo;
         boardSurface = new BoardSurface(gameInfo);
         wExpect = new WolfGroupExpectation(gameInfo);
-        pExpect = new PossessedExpectation(gameInfo);
+        pExpect = new PossessedExpectation();
         isFinish = false;
     }
 
@@ -62,7 +62,7 @@ public class Fuku6u implements Player {
                 return;
             case 1: // 1日目
                 // 役職セット
-                boardSurface.setAssignRole(gameInfo.getRole());
+                boardSurface.setAssignRole(gameInfo);
                 // 役職固有の処理
                 boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wExpect);
                 break;
@@ -111,10 +111,16 @@ public class Fuku6u implements Player {
     @Override
     public Agent vote() {
         Log.debug("vote()実行");
-        Observation.vote(boardSurface);
-        // 人狼予想グループクラスから，不信度の高いグループを取り出す
-        List<Agent> blackList = wExpect.getBlackAgent();   // 投票すべきエージェントのリストを取得
-        Agent votedAgent = Util.randomElementSelect(blackList);
+
+        TalkEndObserver talkEndObserver = new TalkEndObserver(gameInfo, boardSurface, wExpect, pExpect);
+        talkEndObserver.check();
+
+        // voteは格役職毎に処理を変えるため，.roleへ処理を移行し，投票先を受け取る
+        List<Agent> candidateAgentList = gameInfo.getAliveAgentList();
+        candidateAgentList.remove(boardSurface.getMe());
+        List<Agent> votedAgentList = boardSurface.getAssignRole().vote(candidateAgentList, wExpect);
+
+        Agent votedAgent = Util.randomElementSelect(votedAgentList);
         Log.info("投票先: " + votedAgent);
         return votedAgent;
     }
@@ -222,7 +228,7 @@ public class Fuku6u implements Player {
                 case COMINGOUT:
                     Log.debug("Taker: " + talk.getAgent() + " CO: " + content.getRole());
                     boardSurface.addComingoutRole(talk.getAgent(), content.getRole()); // CO役職を保管
-                    Observation.comingout(boardSurface, wExpect, pExpect, talk.getAgent(), content.getRole());
+                    TalkObserver.comingout(boardSurface, wExpect, pExpect, talk.getAgent(), content.getRole());
                     break;
                 case ESTIMATE:
                     break;
@@ -230,7 +236,7 @@ public class Fuku6u implements Player {
                 case DIVINED:
                     Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget() + " DIV: " + content.getResult());
                     boardSurface.addDivMap(talk.getAgent(), content.getTarget(), content.getResult()); // 占い結果を保管
-                    Observation.divined(boardSurface, wExpect, pExpect, talk.getAgent(), content.getTarget(), content.getResult());
+                    TalkObserver.divined(boardSurface, wExpect, pExpect, talk.getAgent(), content.getTarget(), content.getResult());
                     break;
                 case IDENTIFIED:
                     Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget() + " DIV: " + content.getResult());
