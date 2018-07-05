@@ -13,6 +13,10 @@ public abstract class Expectation {
     protected List<Agent> clearAgentList = new ArrayList<>();
     protected List<Agent> convictionAgentList = new ArrayList<>();
 
+    public List<Agent> getClearAgentList() {
+        return clearAgentList;
+    }
+
     /**
      * 容疑が晴れたエージェント（確定白など）を登録する
      * @param clearAgent

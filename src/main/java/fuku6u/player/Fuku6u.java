@@ -15,6 +15,8 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Fuku6u implements Player {
@@ -128,7 +130,51 @@ public class Fuku6u implements Player {
     @Override
     public Agent attack() {
         Log.debug("attack()実行");
-        // TODO 占いCOが1人ならアタック　15人の場合は別の人とか　ここも要検討
+        // TODO 投票噛みは回避できる？
+        List<Agent> candidateAgentList = new ArrayList<>();
+
+        // 狂狼でないことが確定している人をattackする
+        List<Agent> possessedClearAgent = pExpect.getClearAgentList();
+        if (!possessedClearAgent.isEmpty()) {
+            candidateAgentList.addAll(possessedClearAgent);
+        }
+        List<Agent> werewolfClearAgent = wExpect.getClearAgentList();
+        if (!werewolfClearAgent.isEmpty()) {
+            candidateAgentList.addAll(werewolfClearAgent);
+        }
+        candidateAgentList.removeAll(boardSurface.getWerewolfList());   // 仲間にattackしないように
+
+        if (!candidateAgentList.isEmpty()) {
+            Agent attackedAgent = Util.randomElementSelect(candidateAgentList);
+            Log.info("襲撃先: " + attackedAgent);
+            return attackedAgent;
+        }
+
+        // 狂人の可能性が低いエージェントにアタック
+        List<Agent> checkAgentList = new ArrayList<>();
+        checkAgentList.addAll(gameInfo.getAliveAgentList());
+        checkAgentList.remove(boardSurface.getMe());
+        checkAgentList.removeAll(boardSurface.getWerewolfList());
+
+        int min_distrust = 1000;
+        for (Agent candidateAgent :
+                checkAgentList) {
+            int distrustValue = pExpect.getAgentDistrust(candidateAgent);
+            if (distrustValue < min_distrust) {
+                candidateAgentList.clear();
+                min_distrust = distrustValue;
+            }
+            if (distrustValue == min_distrust) {
+                candidateAgentList.add(candidateAgent);
+            }
+        }
+
+        if (!candidateAgentList.isEmpty()) {
+            Agent attackedAgent = Util.randomElementSelect(candidateAgentList);
+            Log.info("襲撃先: " + attackedAgent);
+            return attackedAgent;
+        }
+
         return null;
     }
 
