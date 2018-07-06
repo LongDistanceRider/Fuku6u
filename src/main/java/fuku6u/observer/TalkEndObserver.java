@@ -1,5 +1,6 @@
 package fuku6u.observer;
 
+import fuku6u.Expectation.Parameter;
 import fuku6u.Expectation.PossessedExpectation;
 import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
@@ -27,42 +28,25 @@ public class TalkEndObserver extends Observer{
     public void check() {
         // 真占い師チェック
         if (!boardSurface.getAssignRole().getRole().equals(Role.SEER)) {
-            List<Agent> seerCoAgent = boardSurface.getComingOutAgentList(Role.SEER);
-            seerCoAgent.remove(lieSeerAgentList);
-            if (seerCoAgent.size() == 1) {
-                wExpect.clearAgent(seerCoAgent.get(0));
-                pExpect.clearAgent(seerCoAgent.get(0));
-                Map<Agent, Species> divinedResult = boardSurface.getDivinedResult(seerCoAgent.get(0));
-                divinedResult.forEach(((agent, species) -> {
-                    if (species.equals(Species.HUMAN)) {
-                        wExpect.clearAgent(agent);
-                        pExpect.clearAgent(agent);
-                    } else {
-                        wExpect.convictionAgent(agent);
-                        pExpect.clearAgent(agent);
-                    }
-                }));
+            Agent genuineSeer = checkGenuineSeer(boardSurface, Role.SEER);
+            if (genuineSeer != null) {
+                wExpect.clearAgent(genuineSeer);
+                pExpect.clearAgent(genuineSeer);
+                Map<Agent, Species> divinedResult = boardSurface.getDivinedResult(genuineSeer);
+                trustResult(divinedResult);
             }
         }
         // 真霊能者チェック
         if (!boardSurface.getAssignRole().getRole().equals(Role.MEDIUM)) {
-            List<Agent> mediumCoAgent = boardSurface.getComingOutAgentList(Role.MEDIUM);
-            mediumCoAgent.remove(lieMediumAgentList);
-            if (mediumCoAgent.size() == 1) {
-                wExpect.clearAgent(mediumCoAgent.get(0));
-                pExpect.clearAgent(mediumCoAgent.get(0));
-                Map<Agent, Species> mediumResult = boardSurface.getIdenResult(mediumCoAgent.get(0));
-                mediumResult.forEach(((agent, species) -> {
-                    if (species.equals(Species.HUMAN)) {
-                        wExpect.clearAgent(agent);
-                        pExpect.clearAgent(agent);
-                    } else {
-                        wExpect.convictionAgent(agent);
-                        pExpect.clearAgent(agent);
-                    }
-                }));
+            Agent genuineMedium = checkGenuineSeer(boardSurface, Role.MEDIUM);
+            if (genuineMedium != null) {
+                wExpect.clearAgent(genuineMedium);
+                pExpect.clearAgent(genuineMedium);
+                Map<Agent, Species> mediumResult = boardSurface.getIdenResult(genuineMedium);
+                trustResult(mediumResult);
             }
         }
+        // TODO 偽占い師偽霊能者の結果をリセットする必要がある
         // TODO 黒を確信したエージェントに対して白出ししている占霊は偽物
 
         // TODO 確定白が存在する場合 => そのエージェントがいるグループは削除
@@ -89,5 +73,17 @@ public class TalkEndObserver extends Observer{
 //        }
         // TODO 占霊狩COしたプレイヤは1人か（自身が占霊狩の場合は除く）
 
+    }
+
+    private void trustResult(Map<Agent, Species> resultMap) {
+        resultMap.forEach(((agent, species) -> {
+            if (species.equals(Species.HUMAN)) {
+                wExpect.clearAgent(agent);
+                pExpect.clearAgent(agent);
+            } else {
+                wExpect.convictionAgent(agent);
+                pExpect.clearAgent(agent);
+            }
+        }));
     }
 }

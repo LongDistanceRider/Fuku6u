@@ -181,17 +181,29 @@ public class Fuku6u implements Player {
     @Override
     public Agent divine() {
         Log.debug("divine()実行");
-        // TODO とりあえず占い候補から占う　意味のある占い候補を選ぶ必要がある
         List<Agent> candidateAgentList = boardSurface.getCandidateDivinedAgentList();
-        if (!candidateAgentList.isEmpty()) {
-            return Util.randomElementSelect(candidateAgentList);
+        // 人狼の可能性が高いエージェントを占う
+        List<Agent> maxDistrustAgents = wExpect.getMaxDistrustAgent(candidateAgentList);
+        if (!maxDistrustAgents.isEmpty()) {
+            return Util.randomElementSelect(maxDistrustAgents);
         }
-        return null;
+        // 生存プレイヤの中から狂人の可能性が高いエージェントを除き，適当に選択する
+        maxDistrustAgents = pExpect.getMaxDistrustAgent(candidateAgentList);
+        if (!maxDistrustAgents.isEmpty()) {
+            candidateAgentList.removeAll(pExpect.getMaxDistrustAgent(candidateAgentList));
+        }
+        return Util.randomElementSelect(candidateAgentList);
     }
 
     @Override
     public Agent guard() {
         Log.debug("guard()実行");
+        // 確定占い師が存在する場合は占い師をguardする
+        // 確定霊能者が存在する場合は霊能者をguardする
+        // 占い師の中から人狼の可能性が低い方を選択する
+        // 霊能者の中から人狼の可能性が低い方を選択する
+        // 生存者の中から人狼の可能性が低いagentを選択する
+        // 生存者の中から適当に護衛先を選択する
         // TODO ガード先は○-○進行によって変える必要がある．とりあえず適当に処理書いておく
         List<Agent> candidates = gameInfo.getAliveAgentList();
         candidates.remove(boardSurface.getMe());

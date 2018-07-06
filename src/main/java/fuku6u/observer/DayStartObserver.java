@@ -11,6 +11,7 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
 import org.aiwolf.common.net.GameInfo;
 
+import javax.management.relation.RoleStatus;
 import java.util.Map;
 
 public class DayStartObserver extends Observer {
@@ -36,7 +37,8 @@ public class DayStartObserver extends Observer {
             for (Map.Entry<Agent, Species> divinedResult:
                     boardSurface.getDivinedResult(seerCOAgent).entrySet()) { // 占い結果
                 if (divinedResult.getKey().equals(attackedAgent) && divinedResult.getValue().equals(Species.WEREWOLF)) {    // 襲撃されたプレイヤに対して黒判定を出していた場合
-                    lieSeerAgentList.add(seerCOAgent);
+                    // 嘘つきをリスト追加
+                    addlieRoleAgentMapList(Role.SEER, seerCOAgent);
                     wExpect.distrustCalc(seerCOAgent, Parameter.convictionPossessedWerewolf);   // 狂狼を確信
                     pExpect.distrustCalc(seerCOAgent, Parameter.convictionPossessedWerewolf);  // ほぼ狂もしかしたら狼を確信
 

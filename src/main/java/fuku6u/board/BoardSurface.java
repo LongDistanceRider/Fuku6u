@@ -109,7 +109,6 @@ public class BoardSurface {
      * @return
      */
     public List<Agent> getCandidateDivinedAgentList () {
-        // TODO .role.Seerへ移行
         List<Agent> candidateAgentList = new ArrayList<>();
         List<Agent> yetDivinedAgentList = getYetDivinedAgentList();
         List<Agent> aliveAgentList = getAliveAgentList();

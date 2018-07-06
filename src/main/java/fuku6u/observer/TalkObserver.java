@@ -39,14 +39,7 @@ public class TalkObserver extends Observer {
                     pExpect.distrustCalc(seerAgent, Parameter.convictionPossessedWerewolf);    // 狂人の可能性を少しあげる
                     Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.POSSESSED);   //「狂人だと思う」
                     Utterance.getInstance().offer(Topic.VOTE, seerAgent);   // 「VOTE発言」
-                    // 真占い師確定しているか
-                    if (checkGenuineSeer(boardSurface, seerAgent)) {  // 確定
-                        boardSurface.getComingOutAgentList(Role.SEER).forEach(agent -> {
-                            if (!agent.equals(seerAgent)) { // 偽物は削除
-                                findGenuineSeer(boardSurface, wExpect, pExpect, agent);   // 真占い師処理
-                            }
-                        });
-                    }
+                    addlieRoleAgentMapList(Role.SEER, seerAgent);   // 嘘つきをリストへ追加
                 } else {    // 白だしされた
                     wExpect.distrustCalc(seerAgent, Parameter.unlikely);   // 白より
                     Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.SEER);    //「占い師だと思う」

@@ -1,6 +1,7 @@
 package fuku6u.Expectation;
 
 import org.aiwolf.common.data.Agent;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,23 @@ public abstract class Expectation {
      */
     public abstract int getAgentDistrust(Agent agent);
 
+    public List<Agent> getMaxDistrustAgent(List<Agent> agentList) {
+        List<Agent> maxDistrustAgentList = new ArrayList<>();
+        int maxDistrust = 0;
+        for (Agent agent :
+                agentList) {
+            int distrust = getAgentDistrust(agent);
+            if (distrust > maxDistrust) {
+                maxDistrustAgentList.clear();
+                maxDistrust = distrust;
+            }
+            if (distrust == maxDistrust) {
+                maxDistrustAgentList.add(agent);
+            }
+        }
+        return maxDistrustAgentList;
+    }
+
     public void distrustCalc(Agent agent, Parameter addDistrust) {
         // 同じ箇所から同じ情報を複数加算することを回避するために，フラグ処理を施す
         StackTraceElement[] stackTraceElements = (new Throwable()).getStackTrace(); // スタックトレースより呼び出し元情報の取り出し
@@ -47,6 +65,7 @@ public abstract class Expectation {
         if (!flagList.contains(flagString)) {
             int preDistrust = agentDistrustMap.getOrDefault(agent, 0);
             int distrust = preDistrust + addDistrust.getInt();
+            // agentの不信度を更新
             agentDistrustMap.put(agent, distrust);
             flagList.add(flagString);
         }
