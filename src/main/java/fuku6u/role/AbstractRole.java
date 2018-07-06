@@ -1,5 +1,6 @@
 package fuku6u.role;
 
+import fuku6u.Expectation.PossessedExpectation;
 import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.board.Util;
@@ -31,7 +32,17 @@ public abstract class AbstractRole {
      * 同数の場合は複数のエージェントを返す
      * 全てのエージェントの疑い度が0の場合はnullが返却される
      */
-    public List<Agent> vote(List<Agent> candidateAgentList, WolfGroupExpectation wExpect) {
-        return wExpect.getMaxDistrustAgent(candidateAgentList);
+    public List<Agent> vote(List<Agent> candidateAgentList, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
+        // 人狼の可能性が高いエージェントを返す　
+        List<Agent> maxDistrustAgent = wExpect.getMaxDistrustAgent(candidateAgentList);
+        if (!maxDistrustAgent.isEmpty()) {
+            return maxDistrustAgent;
+        }
+        maxDistrustAgent = pExpect.getMaxDistrustAgent(candidateAgentList);
+        if (!maxDistrustAgent.isEmpty()) {
+            return maxDistrustAgent;
+        }
+        // 人狼の可能性がない場合は，狂人の可能性が高いエージェントを返す
+        return candidateAgentList;
     }
 }

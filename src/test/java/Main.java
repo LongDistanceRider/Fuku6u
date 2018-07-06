@@ -4,7 +4,7 @@ public class Main {
 
     private final static String HOST = "localhost"; // ホスト名 (kanolab 49.212.130.102)
     private final static int PORT = 10000;  // ポート番号
-    private final static int NUMBER_OF_GAME = 100;  // 試合回数
+    private final static int NUMBER_OF_GAME = 3;  // 試合回数
     private final static int NUMBER_OF_PLAYER = 5;  // 対戦人数
 
     public static void main(String[] args) throws InterruptedException {

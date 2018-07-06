@@ -120,7 +120,7 @@ public class Fuku6u implements Player {
         // voteは格役職毎に処理を変えるため，.roleへ処理を移行し，投票先を受け取る
         List<Agent> candidateAgentList = gameInfo.getAliveAgentList();
         candidateAgentList.remove(boardSurface.getMe());
-        List<Agent> votedAgentList = boardSurface.getAssignRole().vote(candidateAgentList, wExpect);
+        List<Agent> votedAgentList = boardSurface.getAssignRole().vote(candidateAgentList, wExpect, pExpect);
 
         Agent votedAgent = Util.randomElementSelect(votedAgentList);
         Log.info("投票先: " + votedAgent);
@@ -284,7 +284,6 @@ public class Fuku6u implements Player {
             switch (content.getTopic()) {
             /* --- 意図表明に関する文 --- */
                 case COMINGOUT:
-                    Log.debug("Taker: " + talk.getAgent() + " CO: " + content.getRole());
                     boardSurface.addComingoutRole(talk.getAgent(), content.getRole()); // CO役職を保管
                     TalkObserver.comingout(boardSurface, wExpect, pExpect, talk.getAgent(), content.getRole());
                     break;
@@ -292,12 +291,10 @@ public class Fuku6u implements Player {
                     break;
             /* --- 能力結果に関する文 --- */
                 case DIVINED:
-                    Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget() + " DIV: " + content.getResult());
                     boardSurface.addDivMap(talk.getAgent(), content.getTarget(), content.getResult()); // 占い結果を保管
                     TalkObserver.divined(boardSurface, wExpect, pExpect, talk.getAgent(), content.getTarget(), content.getResult());
                     break;
                 case IDENTIFIED:
-                    Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget() + " DIV: " + content.getResult());
                     boardSurface.addIdenMap(talk.getAgent(), content.getTarget(), content.getResult()); // 霊能結果を保管
                     break;
 //                case GUARDED:
@@ -308,7 +305,6 @@ public class Fuku6u implements Player {
 //                case GUARD:
 //                    break;
                 case VOTE:
-                    Log.debug("Taker: " + talk.getAgent() + " Target: " + content.getTarget());
                     boardSurface.addVote(talk.getAgent(), content.getTarget()); // 投票先発言を保管
                     break;
 //                case ATTACK:
