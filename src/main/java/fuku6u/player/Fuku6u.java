@@ -100,7 +100,10 @@ public class Fuku6u implements Player {
     public String talk() {
         Log.debug("talk()実行");
         boardSurface.getAssignRole().talk(boardSurface);    // 役職としての発言（CO，占い結果発言，霊能結果発言など）
-
+        String talk = Utterance.getInstance().poll();
+        if (talk != null) {
+            return talk;
+        }
         return Content.OVER.getText();
     }
 

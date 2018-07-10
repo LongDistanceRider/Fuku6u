@@ -50,23 +50,5 @@ public class Possessed extends AbstractRole {
     public void finish(BoardSurface boardSurface) {
 
     }
-
-    @Override
-    public List<Agent> vote(List<Agent> candidateAgentList, WolfGroupExpectation wExpect) {
-        // 狂人ように書き換えること
-        int maxDistrust = 0;
-        List<Agent> mostDistrustAgentList = null;
-        for (Agent agent :
-                candidateAgentList) {
-            int distrust = wExpect.getAgentDistrust(agent);
-            if (distrust > maxDistrust) {
-                mostDistrustAgentList.clear();
-                maxDistrust = distrust;
-            }
-            if (distrust == maxDistrust) {
-                mostDistrustAgentList.add(agent);
-            }
-        }
-        return mostDistrustAgentList;
-    }
+    //TODO vote()をオーバーライドして狂人用に書き換えること
 }
