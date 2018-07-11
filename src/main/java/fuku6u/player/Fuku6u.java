@@ -8,6 +8,7 @@ import fuku6u.log.Log;
 import fuku6u.observer.DayStartObserver;
 import fuku6u.observer.TalkEndObserver;
 import fuku6u.observer.TalkObserver;
+import fuku6u.player.nl.NlProcessing;
 import org.aiwolf.client.lib.Content;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Player;
@@ -21,6 +22,8 @@ import java.util.List;
 
 public class Fuku6u implements Player {
 
+    /* NLスイッチ */
+    private boolean isNl = true;
     /* ゲーム情報 */
     private GameInfo gameInfo;
     /* 盤面 */
@@ -281,8 +284,17 @@ public class Fuku6u implements Player {
             }
             // Talkを保管
             boardSurface.addTalk(talk);
+            //TODO NL処理を噛ませる
+            String text = talk.getText();
+            if (isNl) {
+                // NL処理をかませる
+                text = NlProcessing.convert(boardSurface,talk);
+                if (text == null) {
+                    continue;
+                }
+            }
             // String text を Contentに変換する
-            Content content = new Content(talk.getText());
+            Content content = new Content(text);
             // ラベルごとに処理
             switch (content.getTopic()) {
             /* --- 意図表明に関する文 --- */

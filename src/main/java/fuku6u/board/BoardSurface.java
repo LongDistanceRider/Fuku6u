@@ -329,7 +329,19 @@ public class BoardSurface {
         return yetDivinedAgentList;
     }
 
-
+    /**
+     * agentがCOしている役職を返す
+     * スライドしている場合は，最後のCO役職を返す
+     * @param agent
+     * @return
+     */
+    public Role getCoRole(Agent agent) {
+        List<Role> selfCoRole = getPlayerInfo(agent).getSelfCO();
+        if (selfCoRole.isEmpty()) {
+            return null;
+        }
+        return selfCoRole.get(selfCoRole.size() - 1);
+    }
 }
 
 
