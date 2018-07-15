@@ -288,7 +288,8 @@ public class Fuku6u implements Player {
             String text = talk.getText();
             if (isNl) {
                 // NL処理をかませる
-                text = NlProcessing.convert(boardSurface,talk);
+                NlProcessing nlProcessing = new NlProcessing(talk.getAgent(), boardSurface.getCoRole(talk.getAgent()));
+                List<String> protocolText = nlProcessing.convert(talk.getText());
                 if (text == null) {
                     continue;
                 }

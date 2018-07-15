@@ -1,7 +1,5 @@
-package fuku6u.player.nl;
-
 import fuku6u.log.Log;
-import org.aiwolf.common.data.Agent;
+import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
 import org.apache.lucene.search.spell.LevensteinDistance;
@@ -20,7 +18,7 @@ import java.util.regex.Pattern;
  * 2 フィルターにかける
  * 3 一般化
  */
-public class NlProcessing {
+public class NLTest {
 
     /* PATH */
     private static final String dir = System.getProperty("user.dir");
@@ -33,14 +31,14 @@ public class NlProcessing {
     /* タグファイル */
     private static Map<String, String[]> tagMap = new HashMap<>();
     /* submitのAgent */
-    private Agent submitAgent;
+    private String submitAgent = "submitAgent"; // ここをテスト用に変更
     /* submitがCOした役職 */
-    private Role submitCoRole;
+    private Role submitCoRole = Role.SEER;  // ここをテスト用に変更
 
     static {
         // フィルタ情報の読み込み
         try {
-            File csv = new File(dir + "/lib/filterInformation.txt");
+            File csv = new File(dir + "/lib/filter-info.txt");
 
             BufferedReader bufferedReader = new BufferedReader(new FileReader(csv));
             String readLine;
@@ -49,12 +47,12 @@ public class NlProcessing {
             }
             bufferedReader.close();
         } catch (FileNotFoundException e) {
-            Log.fatal("フィルタ情報読み込みでエラー" + e);
+            System.err.println("フィルタ情報読み込みでエラー" + e);
         } catch (IOException e) {
-            Log.fatal("フィルタ情報読み込みでエラー" + e);
+            System.err.println("フィルタ情報読み込みでエラー" + e);
         }
         // 照合ファイルの読み込み
-        try(BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(dir +"/lib/comparison.csv"))) {
+        try(BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(dir + "/lib/comparison.csv"))) {
             List<String> comparisonList = new ArrayList<>();
             String readLine = "";
             while((readLine = bufferedReader.readLine()) != null) {
@@ -67,7 +65,7 @@ public class NlProcessing {
                 comparisonMap.put(arrayLine[0], Arrays.copyOfRange(arrayLine, 1, arrayLine.length));
             }
         } catch (IOException e) {
-            Log.fatal("照合ファイルの読み込みでエラー" + e);
+            System.err.println("照合ファイルの読み込みでエラー" + e);
         }
         // タグファイルの読み込み
         try(BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(dir + "/lib/tag.csv"))) {
@@ -83,13 +81,16 @@ public class NlProcessing {
                 tagMap.put(arrayLine[0], Arrays.copyOfRange(arrayLine, 1, arrayLine.length));
             }
         } catch (IOException e) {
-            Log.fatal("タグファイルの読み込みでエラー" + e);
+            System.err.println("タグファイルの読み込みでエラー" + e);
         }
     }
 
-    public NlProcessing(Agent submitAgent, Role submitCoRole) {
-        this.submitAgent = submitAgent;
-        this.submitCoRole = submitCoRole;
+    public static void main(String[] args) {
+        NLTest nlTest = new NLTest();
+        List<String> list = nlTest.convert("私は村人です");
+        for (String protocol : list) {
+            System.out.println(protocol);
+        }
     }
 
     /**
@@ -111,7 +112,7 @@ public class NlProcessing {
             if (sentence.equals("") || sentence.equals("Over")
                     || sentence.equals("Skip") || isChat(sentence)) {
                 // 解析する必要のない発話を除外（中身のない発言，Over・Skip発言，雑談
-                Log.trace("NL解析不要: " + sentence);
+                System.out.println("NL解析不要: " + sentence);
                 continue;
             }
             // 句点までの内容にフィルターが引っかからない場合は句点までの文を削除する．
@@ -128,6 +129,7 @@ public class NlProcessing {
             for (Map.Entry<String, String[]> tagEntry:
                     tagMap.entrySet()) {
                 int index;
+//                System.out.println(tagEntry.getKey());
                 String tmpText = sentence;  // 削除されながら走査される文字列
                 while (true) {
                     index = tmpText.indexOf(tagEntry.getKey());
@@ -140,6 +142,7 @@ public class NlProcessing {
                 }
                 convertToTag = convertToTag.replaceAll(tagEntry.getKey(), tagEntry.getValue()[0]); // タグ文字に変換
             }
+
 
             // タグ変換<TARGET>をする
             // -- "Agent["を走査してその後の"]"までを保存する 「Agent[01]は人狼」から「Agent[01]」を取り出す
@@ -173,7 +176,7 @@ public class NlProcessing {
 
             // 距離がDISTANCE_THRESHOLD以下は変換不可能とする
             if (maxDistance < DISTANCE_THRESHOLD) {
-                Log.trace("ユークリッド距離不足:: 距離: " + maxDistance + " sentence: " + sentence + " convertToTag: " + convertToTag);
+                System.out.println("ユークリッド距離不足:: 距離: " + maxDistance + " sentence: " + sentence + " convertToTag: " + convertToTag);
                 continue;
             }
             // 照合ファイルから話題を取って来た後，各話題の処理を行う
@@ -189,7 +192,7 @@ public class NlProcessing {
                         if (role != null) {
                             protocolTextList.add("COMINGOUT " + submitAgent + " " + role);   // プロトコル文変換
                         } else {
-                            Log.warn("Role型がnullのため変換に失敗しました．sentence: " + sentence + " role: " + role);
+                            System.out.println("Role型がnullのため変換に失敗しました．sentence: " + sentence + " role: " + role);
                             break;
                         }
                         break;
@@ -198,7 +201,7 @@ public class NlProcessing {
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
                         if (target == null) {
-                            Log.warn("DIVINED変換中に予期しないエラー（null）が発生しました．sentence: " + sentence);
+                            System.out.println("DIVINED変換中に予期しないエラー（null）が発生しました．sentence: " + sentence);
                             break;
                         }
                         // <ROLE>からSPECIES照合
@@ -211,7 +214,7 @@ public class NlProcessing {
                             } else if (submitCoRole.equals(Role.MEDIUM)) {
                                 protocolTextList.add("IDENTIFIED " + target + " " + species);
                             } else {
-                                Log.warn("発言者がCOした役職がわからなかったため，ESTIMATEに強制変換しました．");
+                                System.out.println("発言者がCOした役職がわからなかったため，ESTIMATEに強制変換しました．");
                                 protocolTextList.add("ESTIMATE " + target + " " + species);
                             }
                         }
@@ -220,7 +223,7 @@ public class NlProcessing {
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
                         if (target == null) {
-                            Log.warn("DIVINED変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
+                            System.out.println("DIVINED変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
                         }
                         // <ROLE>照合
@@ -228,7 +231,7 @@ public class NlProcessing {
                         if (role != null) {
                             protocolTextList.add("ESTIMATE " + target + " " + role);
                         } else {
-                            Log.warn("DIVINED変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
+                            System.out.println("DIVINED変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
                         }
                         break;
@@ -238,7 +241,7 @@ public class NlProcessing {
                         if (target != null) {
                             protocolTextList.add("VOTE " + target);
                         } else {
-                            Log.warn("VOTE変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
+                            System.out.println("VOTE変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
                         }
                         break;
@@ -248,7 +251,7 @@ public class NlProcessing {
                         if (target != null) {
 //                            protocolTextList.add("REQUEST VOTE " + target);   // REQUESTの書き方がわからないので，コメントアウトしておく
                         } else {
-                            Log.warn("REQUEST_VOTE変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
+                            System.out.println("REQUEST_VOTE変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
                         }
                         break;
@@ -258,7 +261,7 @@ public class NlProcessing {
                         if (target != null) {
                             // TODO NL話題の処理をここに書く
                         } else {
-                            Log.warn("IMPOSSIBLE変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
+                            System.out.println("IMPOSSIBLE変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
                         }
                         break;
@@ -268,7 +271,7 @@ public class NlProcessing {
                         if (target != null) {
                             // TODO NL話題の処理をここに書く
                         } else {
-                            Log.warn("LIAR変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
+                            System.out.println("LIAR変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
                         }
                         break;
@@ -278,7 +281,7 @@ public class NlProcessing {
                         if (target != null) {
                             // TODO NL話題の処理をここに書く
                         } else {
-                            Log.warn("SUSPICIOUS変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
+                            System.out.println("SUSPICIOUS変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
                         }
                         break;
@@ -288,12 +291,12 @@ public class NlProcessing {
                         if (target != null) {
                             // TODO NL話題の処理をここに書く
                         } else {
-                            Log.warn("TRUST変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
+                            System.out.println("TRUST変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
                         }
                         break;
                     default:
-                        Log.warn("想定していないSwitch-defaultに分岐しました．sentence: " + sentence + " topics[i]" + topics[i]);
+                        System.out.println("想定していないSwitch-defaultに分岐しました．sentence: " + sentence + " topics[i]" + topics[i]);
                         break;
 
                 }
@@ -320,7 +323,7 @@ public class NlProcessing {
         try {
             species = Species.valueOf(speciesString);
         } catch (IllegalArgumentException e) {
-            Log.warn("存在しないSpecies型に変換しようとして失敗しました．talkText: " + text.getTalkText());
+            System.out.println("存在しないSpecies型に変換しようとして失敗しました．talkText: " + text.getTalkText());
         }
         return species;
     }
@@ -334,13 +337,13 @@ public class NlProcessing {
      */
     private Role getRole (Text text, int number) {
         Role role = null;
-        String speciesString = getRoleOrSpecies(text, number, 1);
+        String roleString = getRoleOrSpecies(text, number, 1);
 
         try {
             // Role型に変換
-            role = Role.valueOf(speciesString);
+            role = Role.valueOf(roleString);
         } catch(IllegalArgumentException e) {
-            Log.warn("存在しないRole型に変換しようとして失敗しました．talkText: " + text.getTalkText());
+            System.out.println("存在しないRole型に変換しようとして失敗しました．talkText: " + text.getTalkText());
         }
         return role;
     }
@@ -350,12 +353,13 @@ public class NlProcessing {
         List<String> tagStringListCo = text.getTagStringList("<ROLE>",cast);
         if (!tagStringListCo.isEmpty()) {
             try {
-                String tagString = tagStringListCo.get(number);   // tagString = SEER | WEREWOLF |　などなど．．．
+                string = tagStringListCo.get(number);   // tagString = SEER | WEREWOLF |　などなど．．．
             } catch(IndexOutOfBoundsException e) {
-                Log.warn("存在しないインデックスを取得しようとして失敗しました．talkText: " + text.getTalkText());
+                System.out.println("存在しないインデックスを取得しようとして失敗しました．talkText: " + text.getTalkText() + " string:" + string + " number: " + number);
+
             }
         } else {
-            Log.trace("COMINGOUT変換中に<ROLE>タグが見つからず，解析終了．talkText:" + text.getTalkText());
+            System.out.println("COMINGOUT変換中に<ROLE>タグが見つからず，解析終了．talkText:" + text.getTalkText());
         }
         return string;
 
@@ -368,10 +372,10 @@ public class NlProcessing {
             try {
                 targetString = targetList.get(number);
             } catch(IndexOutOfBoundsException e) {
-                Log.warn("存在しないインデックスを取得しようとして失敗しました．talkText: " + text.getTalkText());
+                System.out.println("存在しないインデックスを取得しようとして失敗しました．talkText: " + text.getTalkText());
             }
         } else {
-            Log.trace("DIVINED変換中に<TARGET>タグが見つからず，解析終了．talkText: " + text.getTalkText());
+            System.out.println("変換中に<TARGET>タグが見つからず，解析終了．talkText: " + text.getTalkText());
         }
         return targetString;
     }
@@ -387,3 +391,5 @@ public class NlProcessing {
 
 
 }
+
+
