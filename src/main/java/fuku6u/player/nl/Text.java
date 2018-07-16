@@ -2,16 +2,14 @@ package fuku6u.player.nl;
 
 import org.aiwolf.common.data.Agent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Text {
 
     private String talkText;
     private List<String> sentence;
     private String convertToTag;
-    private List<Map.Entry<String, String[]>> tagEntryList = new ArrayList<>();
+    private ArrayDeque<Map.Entry<String, String[]>> tagEntryList = new ArrayDeque<>();
     private List<String> targetList = new ArrayList<>();
 
     /**
@@ -40,8 +38,17 @@ public class Text {
     // Setter
 
     // Add
-    public void addTagEntryList(Map.Entry<String, String[]> tagEntry) {
-        this.tagEntryList.add(tagEntry);
+    public void addTagEntryList(Map.Entry<String, String[]> tagEntry, String sentence, int addIndex) {
+        // sentenceの出現順にソートする必要があるため，addFirstかaddLastのどちらかを判定する
+        for (Map.Entry<String, String[]> entry :
+                tagEntryList) {
+            int index = sentence.indexOf(entry.getKey());
+            if (addIndex < index) {
+                this.tagEntryList.addFirst(tagEntry);
+                return;
+            }
+        }
+        this.tagEntryList.addLast(tagEntry);
     }
 
     public void addTargetList(String target) {

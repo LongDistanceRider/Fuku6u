@@ -285,34 +285,36 @@ public class Fuku6u implements Player {
             // Talkを保管
             boardSurface.addTalk(talk);
             //TODO NL処理を噛ませる
-            String text = talk.getText();
+            List<String> protocolTextList = new ArrayList<>();
             if (isNl) {
                 // NL処理をかませる
                 NlProcessing nlProcessing = new NlProcessing(talk.getAgent(), boardSurface.getCoRole(talk.getAgent()));
-                List<String> protocolText = nlProcessing.convert(talk.getText());
-                if (text == null) {
-                    continue;
-                }
+                protocolTextList = nlProcessing.convert(talk.getText());
+            } else {
+                protocolTextList.add(talk.getText());
             }
-            // String text を Contentに変換する
-            Content content = new Content(text);
-            // ラベルごとに処理
-            switch (content.getTopic()) {
+            for (String protocolText :
+                    protocolTextList) {
+                Log.info("ProtocolText: " + protocolText);
+                // String text を Contentに変換する
+                Content content = new Content(protocolText);
+                // ラベルごとに処理
+                switch (content.getTopic()) {
             /* --- 意図表明に関する文 --- */
-                case COMINGOUT:
-                    boardSurface.addComingoutRole(talk.getAgent(), content.getRole()); // CO役職を保管
-                    TalkObserver.comingout(boardSurface, wExpect, pExpect, talk.getAgent(), content.getRole());
-                    break;
-                case ESTIMATE:
-                    break;
+                    case COMINGOUT:
+                        boardSurface.addComingoutRole(talk.getAgent(), content.getRole()); // CO役職を保管
+                        TalkObserver.comingout(boardSurface, wExpect, pExpect, talk.getAgent(), content.getRole());
+                        break;
+                    case ESTIMATE:
+                        break;
             /* --- 能力結果に関する文 --- */
-                case DIVINED:
-                    boardSurface.addDivMap(talk.getAgent(), content.getTarget(), content.getResult()); // 占い結果を保管
-                    TalkObserver.divined(boardSurface, wExpect, pExpect, talk.getAgent(), content.getTarget(), content.getResult());
-                    break;
-                case IDENTIFIED:
-                    boardSurface.addIdenMap(talk.getAgent(), content.getTarget(), content.getResult()); // 霊能結果を保管
-                    break;
+                    case DIVINED:
+                        boardSurface.addDivMap(talk.getAgent(), content.getTarget(), content.getResult()); // 占い結果を保管
+                        TalkObserver.divined(boardSurface, wExpect, pExpect, talk.getAgent(), content.getTarget(), content.getResult());
+                        break;
+                    case IDENTIFIED:
+                        boardSurface.addIdenMap(talk.getAgent(), content.getTarget(), content.getResult()); // 霊能結果を保管
+                        break;
 //                case GUARDED:
 //                    break;
 //            /* --- ルール行動・能力に関する文 --- */
@@ -320,9 +322,9 @@ public class Fuku6u implements Player {
 //                    break;
 //                case GUARD:
 //                    break;
-                case VOTE:
-                    boardSurface.addVote(talk.getAgent(), content.getTarget()); // 投票先発言を保管
-                    break;
+                    case VOTE:
+                        boardSurface.addVote(talk.getAgent(), content.getTarget()); // 投票先発言を保管
+                        break;
 //                case ATTACK:
 //                    break;
 //            /* --- 同意・非同意に関する文 --- */
@@ -338,10 +340,11 @@ public class Fuku6u implements Player {
 //            /* --- REQUEST文 --- */
 //                case OPERATOR:
 //                    break;
-                default:
-                    break;
+                    default:
+                        break;
+                }
+
             }
-//            Log.info(">> " + talk.getAgent() + " : " + talk.getText());
         }
         talkListHead = talkList.size();
     }

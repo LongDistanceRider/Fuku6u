@@ -40,7 +40,7 @@ public class NlProcessing {
     static {
         // フィルタ情報の読み込み
         try {
-            File csv = new File(dir + "/lib/filterInformation.txt");
+            File csv = new File(dir + "/lib/filter-info.txt");
 
             BufferedReader bufferedReader = new BufferedReader(new FileReader(csv));
             String readLine;
@@ -132,7 +132,7 @@ public class NlProcessing {
                 while (true) {
                     index = tmpText.indexOf(tagEntry.getKey());
                     if (index != -1) {
-                        text.addTagEntryList(tagEntry);  // 変換を保存
+                        text.addTagEntryList(tagEntry, sentence, index);  // 変換を保存
                         tmpText = tmpText.substring(index + tagEntry.getKey().length());    // 変換したとこまでの文字列を削除して再走査
                     } else {
                         break;
@@ -158,6 +158,7 @@ public class NlProcessing {
             Matcher matcher = pattern.matcher(convertToTag);
             convertToTag = matcher.replaceAll("<TARGET>");  // タグ文字に変換
 
+            Log.trace("照合前比較文: " + convertToTag);
             // 照合
             double maxDistance = 0; // 最大ユークリッド距離（一番近い距離が1，遠い距離が0のdouble型
             Map.Entry<String, String[]> maxComparisonEntry = null;
@@ -171,6 +172,7 @@ public class NlProcessing {
                 }
             }
 
+            Log.trace("最大ユークリッド距離獲得照合ファイル文: " + maxComparisonEntry.getKey() + " 距離: " + maxDistance);
             // 距離がDISTANCE_THRESHOLD以下は変換不可能とする
             if (maxDistance < DISTANCE_THRESHOLD) {
                 Log.trace("ユークリッド距離不足:: 距離: " + maxDistance + " sentence: " + sentence + " convertToTag: " + convertToTag);
@@ -317,10 +319,14 @@ public class NlProcessing {
         Species species = null;
         String speciesString = getRoleOrSpecies(text, number, 2);
 
+        if (speciesString != null) {
         try {
             species = Species.valueOf(speciesString);
         } catch (IllegalArgumentException e) {
             Log.warn("存在しないSpecies型に変換しようとして失敗しました．talkText: " + text.getTalkText());
+        }
+        } else {
+            Log.warn("変換文からRoleに変換できる単語が発見されませんでした．talkText: " + text.getTalkText());
         }
         return species;
     }
@@ -336,11 +342,15 @@ public class NlProcessing {
         Role role = null;
         String speciesString = getRoleOrSpecies(text, number, 1);
 
-        try {
-            // Role型に変換
-            role = Role.valueOf(speciesString);
-        } catch(IllegalArgumentException e) {
-            Log.warn("存在しないRole型に変換しようとして失敗しました．talkText: " + text.getTalkText());
+        if (speciesString != null) {
+            try {
+                // Role型に変換
+                role = Role.valueOf(speciesString);
+            } catch (IllegalArgumentException e) {
+                Log.warn("存在しないRole型に変換しようとして失敗しました．talkText: " + text.getTalkText());
+            }
+        } else {
+            Log.warn("変換文からRoleに変換できる単語が発見されませんでした．talkText: " + text.getTalkText());
         }
         return role;
     }
@@ -350,7 +360,7 @@ public class NlProcessing {
         List<String> tagStringListCo = text.getTagStringList("<ROLE>",cast);
         if (!tagStringListCo.isEmpty()) {
             try {
-                String tagString = tagStringListCo.get(number);   // tagString = SEER | WEREWOLF |　などなど．．．
+                string = tagStringListCo.get(number);   // tagString = SEER | WEREWOLF |　などなど．．．
             } catch(IndexOutOfBoundsException e) {
                 Log.warn("存在しないインデックスを取得しようとして失敗しました．talkText: " + text.getTalkText());
             }
