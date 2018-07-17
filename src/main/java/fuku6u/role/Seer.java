@@ -28,13 +28,6 @@ public class Seer extends AbstractRole {
             bs.putDivinedResultMap(target, result);     // 占い結果を保管
 
             Utterance.getInstance().offer(Topic.DIVINED, target, result);   // 「targetを占った結果resultだった」
-
-            // 判定によって人狼グループ予想クラスの処理をする
-            if (result.equals(Species.HUMAN)) {
-                wExpect.clearAgent(target);
-            } else {
-                wExpect.convictionAgent(target);
-            }
         }
     }
 

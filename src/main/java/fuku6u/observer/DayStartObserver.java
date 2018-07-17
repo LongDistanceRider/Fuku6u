@@ -48,6 +48,65 @@ public class DayStartObserver extends Observer {
                 }
             }
         }
+        // 自分の役職が霊能者の場合，結果を受けて人狼予想をする．また，黒出しされたプレイヤが占い師COしている場合は，全ての占い結果をバックトラックする．
+        if (boardSurface.getAssignRole().getRole().equals(Role.MEDIUM)) {
+            // 判定によって人狼グループ予想クラスの処理をする
+            Map<Agent, Species> mediumResultMap = boardSurface.getMediumResultMap();    // 自分自身の霊能結果
+            mediumResultMap.forEach(((agent, species) -> {
+                if (species.equals(Species.HUMAN)) {
+                    wExpect.clearAgent(agent);
+                } else {
+                    wExpect.convictionAgent(agent);
+                    // 占い師COしていたか
+                    if (boardSurface.getCoRole(agent).equals(Role.SEER)) {
+                        // 偽物確定
+                        addlieRoleAgentMapList(Role.SEER, agent);
+                        // 発言した占い結果による影響をバックトラック
+                        Map<Agent, Species> lieSeerDivinedResult = boardSurface.getDivinedResult(agent);
+                        lieSeerDivinedResult.forEach((target_lie, species_lie) -> {
+                            // 白を出されたエージェント（自分以外）は白寄りに なっているため，これを逆算
+                            if (!target_lie.equals(boardSurface.getMe())) {
+                                if (species_lie.equals(Species.HUMAN)) {
+                                    wExpect.distrustCalc(target_lie, Parameter.likely);
+                                } else {
+                                    // 黒を出されたエージェントは黒寄りに　なっているため，これを逆算
+                                    wExpect.distrustCalc(target_lie, Parameter.unlikely);
+                                }
+                            }
+                        });
+                    }
+                }
+            }));
+        }
+        // 自分の役職が占い師の場合，結果を受けて人狼予想をする．また，黒出しされたプレイヤが霊能者COしている場合は，全ての霊能結果をバックトラックする．
+        if (boardSurface.getAssignRole().getRole().equals(Role.SEER)) {
+            Map<Agent, Species> divinedResultMap = boardSurface.getMediumResultMap(); // 自分自身の霊能結果
+            divinedResultMap.forEach((agent, species) -> {
+                if (species.equals(Species.HUMAN)) {
+                    wExpect.clearAgent(agent);
+                } else {
+                    wExpect.convictionAgent(agent);
+                    // 霊能COしていたか
+                    if (boardSurface.getCoRole(agent).equals(Role.MEDIUM)) {
+                        // 偽物確定
+                        addlieRoleAgentMapList(Role.MEDIUM, agent);
+                        // 発言した霊能結果による影響をバックトラック
+                        Map<Agent, Species> lieIdentifiedResult = boardSurface.getIdenResult(agent);
+                        lieIdentifiedResult.forEach((target_lie, species_lie) -> {
+                            // 白を出されたエージェント（自分以外）は白寄りに なっているため，これを逆算
+                            if (!target_lie.equals(boardSurface.getMe())) {
+                                if (species_lie.equals(Species.HUMAN)) {
+                                    wExpect.distrustCalc(target_lie, Parameter.likely);
+                                } else {
+                                    // 黒を出されたエージェントは黒寄りに　なっているため，これを逆算
+                                    wExpect.distrustCalc(target_lie, Parameter.unlikely);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
 
 
     }

@@ -324,6 +324,7 @@ public class Fuku6u implements Player {
                             break;
                         case IDENTIFIED:
                             boardSurface.addIdenMap(talk.getAgent(), content.getTarget(), content.getResult()); // 霊能結果を保管
+                            TalkObserver.identified(wExpect, content.getTarget(), content.getResult());
                             break;
 //                case GUARDED:
 //                    break;

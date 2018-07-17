@@ -20,13 +20,13 @@ public class BoardSurface {
     /* 自分自身の役職 */
     private AbstractRole assignRole = null;
     /* 占い結果 */
-    Map<Agent, Species> divinedResultMap = new HashMap<>();
+    private Map<Agent, Species> divinedResultMap = new HashMap<>();
     /* 霊能結果 */
     private Map<Agent, Species> mediumResultMap = new HashMap<>();
     /* PlayerInfoリスト（自分自身は除く） */
     private List<PlayerInfo> playerInfoList = new ArrayList<>();
     /* 人狼メンバーリスト */
-    List<Agent> werewolfList = new ArrayList<>();
+    private List<Agent> werewolfList = new ArrayList<>();
     /* Talkリスト */
     private List<Talk> talkList = new ArrayList<>();
 
@@ -87,6 +87,10 @@ public class BoardSurface {
 
     public void addTalk(Talk talk) {
         talkList.add(talk);
+    }
+
+    public Map<Agent, Species> getMediumResultMap() {
+        return mediumResultMap;
     }
 
     public BoardSurface(GameInfo gameInfo) {

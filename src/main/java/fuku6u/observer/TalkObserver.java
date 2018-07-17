@@ -77,4 +77,13 @@ public class TalkObserver extends Observer {
             }
         }
     }
+    public static void identified(WolfGroupExpectation wExpect, Agent target, Species result) {
+        // 白を出されたエージェントは白よりに
+        if (result.equals(Species.HUMAN)) {
+            wExpect.distrustCalc(target, Parameter.unlikely);
+        } else {
+            // 黒を出されたエージェントは黒寄りに
+            wExpect.distrustCalc(target, Parameter.likely);
+        }
+    }
 }

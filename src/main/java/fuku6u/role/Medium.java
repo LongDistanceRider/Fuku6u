@@ -27,13 +27,6 @@ public class Medium extends AbstractRole {
             bs.putMediumResultMap(target, result);  // 霊能結果を保管
 
             Utterance.getInstance().offer(Topic.IDENTIFIED, target, result);
-
-            // 判定によって人狼グループ予想クラスの処理をする
-            if (result.equals(Species.HUMAN)) {
-                wExpect.clearAgent(target);
-            } else {
-                wExpect.convictionAgent(target);
-            }
         }
     }
 
