@@ -208,13 +208,24 @@ public class NlProcessing {
                         if (species!= null) {
                             // submitがCOした役職＝
                             //  占い師ならばDIVINED，霊能者ならばIDEN
-                            if (submitCoRole.equals(Role.SEER)) {
-                                protocolTextList.add("DIVINED " + target + " " + species);
-                            } else if (submitCoRole.equals(Role.MEDIUM)) {
-                                protocolTextList.add("IDENTIFIED " + target + " " + species);
+                            if (submitCoRole != null) {
+                                if (submitCoRole.equals(Role.SEER)) {
+                                    protocolTextList.add("DIVINED " + target + " " + species);
+                                } else if (submitCoRole.equals(Role.MEDIUM)) {
+                                    protocolTextList.add("IDENTIFIED " + target + " " + species);
+                                } else {
+                                    Log.warn("発言者がCOした役職が占霊ではないため，ESTIMATEに強制変換しました．");
+                                    protocolTextList.add("ESTIMATE " + target + " " + species);
+                                }
                             } else {
-                                Log.warn("発言者がCOした役職がわからなかったため，ESTIMATEに強制変換しました．");
-                                protocolTextList.add("ESTIMATE " + target + " " + species);
+                                // 「占い結果」という単語がある場合のみ，COMINGOUT SEERとDIVINED発言とする．
+                                if (sentence.indexOf("占い結果") != -1) {
+                                    protocolTextList.add("COMINGOUT " + submitAgent +  " SEER");
+                                    protocolTextList.add("DIVINED " + target + " " + species);
+                                } else {
+                                    Log.warn("発言者のCOした役職がないため，ESTIMATEに強制変換しました．");
+                                    protocolTextList.add("ESTIMATE " + target + " " + species);
+                                }
                             }
                         }
                         break;

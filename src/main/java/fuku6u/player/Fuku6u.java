@@ -297,51 +297,62 @@ public class Fuku6u implements Player {
                     protocolTextList) {
                 Log.info("ProtocolText: " + protocolText);
                 // String text を Contentに変換する
-                Content content = new Content(protocolText);
+                Content content = null;
+                try {
+                    content = new Content(protocolText);
+                } catch(Exception e) {
+                    Log.fatal("=== Content変換エラー ===");
+                    Log.fatal("protocolText: " + protocolText);
+                    Log.fatal("エラー文: " + e);
+                    Log.fatal("StackTrace: " + e.getMessage());
+                    Log.fatal(" ===  ===  ===  === ");
+                }
                 // ラベルごとに処理
-                switch (content.getTopic()) {
-            /* --- 意図表明に関する文 --- */
-                    case COMINGOUT:
-                        boardSurface.addComingoutRole(talk.getAgent(), content.getRole()); // CO役職を保管
-                        TalkObserver.comingout(boardSurface, wExpect, pExpect, talk.getAgent(), content.getRole());
-                        break;
-                    case ESTIMATE:
-                        break;
-            /* --- 能力結果に関する文 --- */
-                    case DIVINED:
-                        boardSurface.addDivMap(talk.getAgent(), content.getTarget(), content.getResult()); // 占い結果を保管
-                        TalkObserver.divined(boardSurface, wExpect, pExpect, talk.getAgent(), content.getTarget(), content.getResult());
-                        break;
-                    case IDENTIFIED:
-                        boardSurface.addIdenMap(talk.getAgent(), content.getTarget(), content.getResult()); // 霊能結果を保管
-                        break;
+                if (content != null) {
+                    switch (content.getTopic()) {
+                    /* --- 意図表明に関する文 --- */
+                        case COMINGOUT:
+                            boardSurface.addComingoutRole(talk.getAgent(), content.getRole()); // CO役職を保管
+                            TalkObserver.comingout(boardSurface, wExpect, pExpect, talk.getAgent(), content.getRole());
+                            break;
+                        case ESTIMATE:
+                            break;
+                    /* --- 能力結果に関する文 --- */
+                        case DIVINED:
+                            boardSurface.addDivMap(talk.getAgent(), content.getTarget(), content.getResult()); // 占い結果を保管
+                            TalkObserver.divined(boardSurface, wExpect, pExpect, talk.getAgent(), content.getTarget(), content.getResult());
+                            break;
+                        case IDENTIFIED:
+                            boardSurface.addIdenMap(talk.getAgent(), content.getTarget(), content.getResult()); // 霊能結果を保管
+                            break;
 //                case GUARDED:
 //                    break;
-//            /* --- ルール行動・能力に関する文 --- */
+//                  /* --- ルール行動・能力に関する文 --- */
 //                case DIVINATION:
 //                    break;
 //                case GUARD:
 //                    break;
-                    case VOTE:
-                        boardSurface.addVote(talk.getAgent(), content.getTarget()); // 投票先発言を保管
-                        break;
+                        case VOTE:
+                            boardSurface.addVote(talk.getAgent(), content.getTarget()); // 投票先発言を保管
+                            break;
 //                case ATTACK:
 //                    break;
-//            /* --- 同意・非同意に関する文 --- */
+//                  /* --- 同意・非同意に関する文 --- */
 //                case AGREE:
 //                    break;
 //                case DISAGREE:
 //                    break;
-//            /* --- 発話制御に関する文 --- */
+//                  /* --- 発話制御に関する文 --- */
 //                case OVER:
 //                    break;
 //                case SKIP:
 //                    break;
-//            /* --- REQUEST文 --- */
+//                  /* --- REQUEST文 --- */
 //                case OPERATOR:
 //                    break;
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
 
             }

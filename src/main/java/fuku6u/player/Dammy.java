@@ -29,9 +29,11 @@ public class Dammy implements Player {
 
     @Override
     public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
-        talkList.add("私は村人です。");
-        talkList.add("こんにちは");
-        talkList.add("私が占い師なので、Agent[02]は偽物です。");
+        talkList.add("私が占い師だからAgent[02]さんが裏切り者だと思うわ");
+        talkList.add("今日の占い結果はAgent[03]さんが人間だったよ");
+        talkList.add("今日はAgent[04]に投票しよう");
+        talkList.add("楽しそう！");
+        talkList.add("今日襲われるのは僕だよね。いやだなぁ");
     }
 
 
