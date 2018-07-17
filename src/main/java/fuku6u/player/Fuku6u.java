@@ -282,8 +282,6 @@ public class Fuku6u implements Player {
             if (talk.getAgent().equals(boardSurface.getMe())) {  // 自分自身の発言はスキップ
                 continue;
             }
-            // Talkを保管
-            boardSurface.addTalk(talk);
             //TODO NL処理を噛ませる
             List<String> protocolTextList = new ArrayList<>();
             if (Flag.isNL()) {

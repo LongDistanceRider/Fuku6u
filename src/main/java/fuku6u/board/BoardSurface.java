@@ -5,7 +5,6 @@ import fuku6u.role.*;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
-import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 
 import java.util.ArrayList;
@@ -27,13 +26,52 @@ public class BoardSurface {
     private List<PlayerInfo> playerInfoList = new ArrayList<>();
     /* 人狼メンバーリスト */
     private List<Agent> werewolfList = new ArrayList<>();
-    /* Talkリスト */
-    private List<Talk> talkList = new ArrayList<>();
 
+    // Getter
+    public AbstractRole getAssignRole() {
+        return assignRole;
+    }
+    public Agent getMe() {
+        return me;
+    }
+    public Map<Agent, Species> getDivinedResultMap() {
+        return divinedResultMap;
+    }
+    public List<Agent> getWerewolfList() {
+        return werewolfList;
+    }
+    public Map<Agent, Species> getMediumResultMap() {
+        return mediumResultMap;
+    }
+
+    // Setter
+    public void putDivinedResultMap(Agent target, Species result) {
+        divinedResultMap.put(target, result);
+    }
+    public void putMediumResultMap(Agent target, Species result) {
+        mediumResultMap.put(target, result);
+    }
+
+    /**
+     * コンストラクタ
+     * @param gameInfo gameInfo
+     */
+    public BoardSurface(GameInfo gameInfo) {
+        this.me = gameInfo.getAgent();
+        for (Agent agent :
+                gameInfo.getAgentList()) {
+            if (agent == this.me) continue; // 自分自身はスキップ
+            playerInfoList.add(new PlayerInfo(agent));
+        }
+    }
+
+    /**
+     * 役職をセット
+     * @param gameInfo gameInfo
+     */
     public void setAssignRole(GameInfo gameInfo) {
         Role role = gameInfo.getRole();
         Log.info("MyRole: " + role);
-        // TODO しばらく役職は村人固定　随時追加
         switch (role) {
             case SEER:
                 assignRole = new Seer();
@@ -62,55 +100,11 @@ public class BoardSurface {
         }
     }
 
-    public AbstractRole getAssignRole() {
-        return assignRole;
-    }
-
-    public Agent getMe() {
-        return me;
-    }
-
-    public void putDivinedResultMap(Agent target, Species result) {
-        divinedResultMap.put(target, result);
-    }
-
-    public void putMediumResultMap(Agent target, Species result) {
-        mediumResultMap.put(target, result);
-    }
-    public Map<Agent, Species> getDivinedResultMap() {
-        return divinedResultMap;
-    }
-
-    public List<Agent> getWerewolfList() {
-        return werewolfList;
-    }
-
-    public void addTalk(Talk talk) {
-        talkList.add(talk);
-    }
-
-    public Map<Agent, Species> getMediumResultMap() {
-        return mediumResultMap;
-    }
-
-    public BoardSurface(GameInfo gameInfo) {
-        this.me = gameInfo.getAgent();
-        for (Agent agent :
-                gameInfo.getAgentList()) {
-            if (agent == this.me) continue; // 自分自身はスキップ
-            playerInfoList.add(new PlayerInfo(agent));
-        }
-    }
-
-    /*
-        情報加工
-     */
-
     /**
      * 占い候補となるエージェントリストを返す
      *
      * このリストは　まだ占われていない　かつ　生存しているプレイヤを返す
-     * @return
+     * @return 占える対象かつ，占っていないエージェントのリスト
      */
     public List<Agent> getCandidateDivinedAgentList () {
         List<Agent> candidateAgentList = new ArrayList<>();
@@ -126,8 +120,8 @@ public class BoardSurface {
     /**
      * ある役職をカミングアウトしたエージェントのリストを返す
      *
-     * @param role
-     * @return
+     * @param role 手に入れたい役職
+     * @return roleで指定した役職をカミングアウトしたエージェントのリスト
      */
     public List<Agent> getComingOutAgentList (Role role) {
         List<Agent> comingoutAgentList = new ArrayList<>();
@@ -147,15 +141,34 @@ public class BoardSurface {
     /**
      * あるエージェントが発言した占い結果を返す
      *
-     * @param submit
-     * @return
+     * @param submit 発言者エージェント
+     * @return submitで指定したエージェントが発言した占い結果
      */
+
     public Map<Agent, Species> getDivinedResult (Agent submit) {
-        return getPlayerInfo(submit).getDivMap();
+        PlayerInfo playerInfo = getPlayerInfo(submit);
+        if (playerInfo != null) {
+            return playerInfo.getDivMap();
+        } else {
+            Log.warn("getDivinedResultで渡された引数は不正です．submit: " + submit);
+        }
+        return null;
     }
 
+    /**
+     * あるエージェントが発言した霊能結果を返す
+     * @param submit 発言者エージェント
+     * @return submitで指定したエージェントが発言した霊能結果
+     */
+
     public Map<Agent,Species> getIdenResult(Agent submit) {
-        return getPlayerInfo(submit).getIdenMap();
+        PlayerInfo playerInfo = getPlayerInfo(submit);
+        if (playerInfo != null) {
+            return playerInfo.getIdenMap();
+        } else {
+            Log.warn("getIdenResultで渡された引数は不正です．submit: " + submit);
+        }
+        return null;
     }
 
     /**

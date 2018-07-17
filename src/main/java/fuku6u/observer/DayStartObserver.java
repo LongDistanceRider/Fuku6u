@@ -80,7 +80,7 @@ public class DayStartObserver extends Observer {
         }
         // 自分の役職が占い師の場合，結果を受けて人狼予想をする．また，黒出しされたプレイヤが霊能者COしている場合は，全ての霊能結果をバックトラックする．
         if (boardSurface.getAssignRole().getRole().equals(Role.SEER)) {
-            Map<Agent, Species> divinedResultMap = boardSurface.getMediumResultMap(); // 自分自身の霊能結果
+            Map<Agent, Species> divinedResultMap = boardSurface.getDivinedResultMap(); // 自分自身の占い師結果
             divinedResultMap.forEach((agent, species) -> {
                 if (species.equals(Species.HUMAN)) {
                     wExpect.clearAgent(agent);
