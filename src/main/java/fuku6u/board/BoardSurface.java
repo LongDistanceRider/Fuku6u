@@ -53,6 +53,20 @@ public class BoardSurface {
     }
 
     /**
+     * カミングアウトした役職を保管
+     * @param agent カミングアウトしたエージェント
+     * @param role カミングアウトした役職
+     */
+    public void addComingoutRole (Agent agent, Role role) {
+        PlayerInfo playerInfo = getPlayerInfo(agent);
+        if (playerInfo != null) {
+            playerInfo.addComingoutRole(role);
+        } else {
+            Log.warn("addComingoutRoleで渡された引数は不正です．agent: " + agent);
+        }
+    }
+
+    /**
      * コンストラクタ
      * @param gameInfo gameInfo
      */
@@ -99,7 +113,6 @@ public class BoardSurface {
                 assignRole = new Villager();
         }
     }
-
     /**
      * 占い候補となるエージェントリストを返す
      *
@@ -117,6 +130,7 @@ public class BoardSurface {
         });
         return candidateAgentList;
     }
+
     /**
      * ある役職をカミングアウトしたエージェントのリストを返す
      *
@@ -169,61 +183,6 @@ public class BoardSurface {
             Log.warn("getIdenResultで渡された引数は不正です．submit: " + submit);
         }
         return null;
-    }
-
-    /**
-     * 黒判定を出されたエージェントのリストを返す
-     *
-     * @return
-     */
-    public List<Agent> getBlackDivinedAgentList () {
-        List<Agent> blackDivinedAgentList = new ArrayList<>();
-
-        List<Agent> comingoutSeerList = getComingOutAgentList(Role.SEER);
-        for (Agent seerAgent :
-                comingoutSeerList) {
-            Map<Agent, Species> divinedResultMap = getDivinedResult(seerAgent);
-            for (Map.Entry<Agent, Species> divinedResult :
-                    divinedResultMap.entrySet()) {
-                if (divinedResult.getValue().equals(Species.WEREWOLF)) {
-                    blackDivinedAgentList.add(divinedResult.getKey());
-                }
-            }
-        }
-        return blackDivinedAgentList;
-    }
-
-    /**
-     * 白判定を出されたエージェントのリストを返す
-     * @return
-     */
-    public List<Agent> getWhiteDivinedAgentList () {
-        List<Agent> whiteDivinedAgentList = new ArrayList<>();
-
-        List<Agent> comingoutSeerList = getComingOutAgentList(Role.SEER);
-        for (Agent seerAgent :
-                comingoutSeerList) {
-            Map<Agent, Species> divinedResultMap = getDivinedResult(seerAgent);
-            for (Map.Entry<Agent, Species> divinedResult :
-                    divinedResultMap.entrySet()) {
-                if (divinedResult.getValue().equals(Species.HUMAN)) {
-                    whiteDivinedAgentList.add(divinedResult.getKey());
-                }
-            }
-        }
-        return whiteDivinedAgentList;
-    }
-
-    /*
-        PlayerInfo操作
-     */
-    /**
-     * カミングアウトした役職を保管
-     * @param agent
-     * @param role
-     */
-    public void addComingoutRole (Agent agent, Role role) {
-        getPlayerInfo(agent).addComingoutRole(role);
     }
 
     /**
@@ -359,6 +318,49 @@ public class BoardSurface {
         }
         return selfCoRole.get(selfCoRole.size() - 1);
     }
+
+//    /**
+//     * 黒判定を出されたエージェントのリストを返す
+//     *
+//     * @return
+//     */
+//    public List<Agent> getBlackDivinedAgentList () {
+//        List<Agent> blackDivinedAgentList = new ArrayList<>();
+//
+//        List<Agent> comingoutSeerList = getComingOutAgentList(Role.SEER);
+//        for (Agent seerAgent :
+//                comingoutSeerList) {
+//            Map<Agent, Species> divinedResultMap = getDivinedResult(seerAgent);
+//            for (Map.Entry<Agent, Species> divinedResult :
+//                    divinedResultMap.entrySet()) {
+//                if (divinedResult.getValue().equals(Species.WEREWOLF)) {
+//                    blackDivinedAgentList.add(divinedResult.getKey());
+//                }
+//            }
+//        }
+//        return blackDivinedAgentList;
+//    }
+//
+//    /**
+//     * 白判定を出されたエージェントのリストを返す
+//     * @return
+//     */
+//    public List<Agent> getWhiteDivinedAgentList () {
+//        List<Agent> whiteDivinedAgentList = new ArrayList<>();
+//
+//        List<Agent> comingoutSeerList = getComingOutAgentList(Role.SEER);
+//        for (Agent seerAgent :
+//                comingoutSeerList) {
+//            Map<Agent, Species> divinedResultMap = getDivinedResult(seerAgent);
+//            for (Map.Entry<Agent, Species> divinedResult :
+//                    divinedResultMap.entrySet()) {
+//                if (divinedResult.getValue().equals(Species.HUMAN)) {
+//                    whiteDivinedAgentList.add(divinedResult.getKey());
+//                }
+//            }
+//        }
+//        return whiteDivinedAgentList;
+//    }
 }
 
 
