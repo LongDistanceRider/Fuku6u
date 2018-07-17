@@ -4,6 +4,7 @@ import fuku6u.Expectation.PossessedExpectation;
 import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.board.Util;
+import fuku6u.flag.Flag;
 import fuku6u.log.Log;
 import fuku6u.observer.DayStartObserver;
 import fuku6u.observer.TalkEndObserver;
@@ -22,8 +23,6 @@ import java.util.List;
 
 public class Fuku6u implements Player {
 
-    /* NLスイッチ */
-    private boolean isNl = true;
     /* ゲーム情報 */
     private GameInfo gameInfo;
     /* 盤面 */
@@ -39,6 +38,7 @@ public class Fuku6u implements Player {
 
     @Override
     public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
+        Log.startLog();
         Log.debug("initialize()実行");
         this.gameInfo = gameInfo;
         boardSurface = new BoardSurface(gameInfo);
@@ -286,7 +286,7 @@ public class Fuku6u implements Player {
             boardSurface.addTalk(talk);
             //TODO NL処理を噛ませる
             List<String> protocolTextList = new ArrayList<>();
-            if (isNl) {
+            if (Flag.isNL()) {
                 // NL処理をかませる
                 NlProcessing nlProcessing = new NlProcessing(talk.getAgent(), boardSurface.getCoRole(talk.getAgent()));
                 protocolTextList = nlProcessing.convert(talk.getText());
