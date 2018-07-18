@@ -74,7 +74,7 @@ public class Fuku6u implements Player {
             default: // 2日目以降
                 // 被投票者
                 Agent executedAgent = gameInfo.getExecutedAgent();
-                boardSurface.executedAgent(executedAgent);  // 追放されたエージェントを保管
+                boardSurface.addExecutedAgentList(executedAgent);  // 追放されたエージェントを保管
                 Log.info("追放者: " + executedAgent);
                 // 被害者
                 Agent attackedAgent = null;
@@ -86,7 +86,7 @@ public class Fuku6u implements Player {
                     }
                 }
                 if (attackedAgent != null) {
-                    boardSurface.attackedAgent(attackedAgent);
+                    boardSurface.addAttackedAgentList(attackedAgent);
                     Log.info("被害者 : " + attackedAgent);
                 } else {
                     Log.info("被害者 : なし（GJ発生）");
@@ -187,7 +187,7 @@ public class Fuku6u implements Player {
     @Override
     public Agent divine() {
         Log.debug("divine()実行");
-        List<Agent> candidateAgentList = boardSurface.getCandidateDivinedAgentList();
+        List<Agent> candidateAgentList = boardSurface.getCandidateDivinedAgentList(gameInfo.getAliveAgentList());
         // 人狼の可能性が高いエージェントを占う
         List<Agent> maxDistrustAgents = wExpect.getMaxDistrustAgent(candidateAgentList);
         if (!maxDistrustAgents.isEmpty()) {
@@ -310,18 +310,18 @@ public class Fuku6u implements Player {
                     switch (content.getTopic()) {
                     /* --- 意図表明に関する文 --- */
                         case COMINGOUT:
-                            boardSurface.addComingoutRole(talk.getAgent(), content.getRole()); // CO役職を保管
+                            boardSurface.addCoRole(talk.getAgent(), content.getRole()); // CO役職を保管
                             TalkObserver.comingout(boardSurface, wExpect, pExpect, talk.getAgent(), content.getRole());
                             break;
                         case ESTIMATE:
                             break;
                     /* --- 能力結果に関する文 --- */
                         case DIVINED:
-                            boardSurface.addDivMap(talk.getAgent(), content.getTarget(), content.getResult()); // 占い結果を保管
+                            boardSurface.putDivinedMap(talk.getAgent(), content.getTarget(), content.getResult()); // 占い結果を保管
                             TalkObserver.divined(boardSurface, wExpect, pExpect, talk.getAgent(), content.getTarget(), content.getResult());
                             break;
                         case IDENTIFIED:
-                            boardSurface.addIdenMap(talk.getAgent(), content.getTarget(), content.getResult()); // 霊能結果を保管
+                            boardSurface.putIdentifiedMap(talk.getAgent(), content.getTarget(), content.getResult()); // 霊能結果を保管
                             TalkObserver.identified(wExpect, content.getTarget(), content.getResult());
                             break;
 //                case GUARDED:

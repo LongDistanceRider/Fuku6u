@@ -10,8 +10,6 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
 import org.aiwolf.common.net.GameInfo;
 
-import java.util.List;
-
 public class Seer extends AbstractRole {
     @Override
     public Role getRole() {
@@ -25,7 +23,7 @@ public class Seer extends AbstractRole {
         if (divination != null) {
             Agent target = divination.getTarget();
             Species result = divination.getResult();
-            bs.putDivinedResultMap(target, result);     // 占い結果を保管
+            bs.putDivinedMap(target, result);     // 占い結果を保管
 
             Utterance.getInstance().offer(Topic.DIVINED, target, result);   // 「targetを占った結果resultだった」
         }

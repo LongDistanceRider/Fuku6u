@@ -24,7 +24,7 @@ public class Medium extends AbstractRole {
         if (medium != null) {
             Agent target = medium.getTarget();
             Species result = medium.getResult();
-            bs.putMediumResultMap(target, result);  // 霊能結果を保管
+            bs.putIdentifiedMap(target, result);  // 霊能結果を保管
 
             Utterance.getInstance().offer(Topic.IDENTIFIED, target, result);
         }

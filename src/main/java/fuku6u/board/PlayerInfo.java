@@ -18,10 +18,6 @@ class PlayerInfo {
     private Map<Agent, Species> divMap = new HashMap<>();
     /* 霊能結果リスト */
     private Map<Agent, Species> idenMap = new HashMap<>();
-    /* 襲撃されたか */
-    private boolean isAttacked = false;
-    /* 追放されたか */
-    private boolean isExecuted = false;
     /* 投票先発言リスト */
     private List<Agent> voteList = new ArrayList<>();
 
@@ -35,22 +31,6 @@ class PlayerInfo {
 
     public Map<Agent, Species> getDivMap() {
         return divMap;
-    }
-
-    public boolean isAttacked() {
-        return isAttacked;
-    }
-
-    public boolean isExecuted() {
-        return isExecuted;
-    }
-
-    public void setAttacked(boolean attacked) {
-        isAttacked = attacked;
-    }
-
-    public void setExecuted(boolean executed) {
-        isExecuted = executed;
     }
 
     /**

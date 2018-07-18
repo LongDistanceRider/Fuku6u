@@ -19,13 +19,17 @@ public class BoardSurface {
     /* 自分自身の役職 */
     private AbstractRole assignRole = null;
     /* 占い結果 */
-    private Map<Agent, Species> divinedResultMap = new HashMap<>();
+    private Map<Agent, Species> divinedMap = new HashMap<>();
     /* 霊能結果 */
-    private Map<Agent, Species> mediumResultMap = new HashMap<>();
+    private Map<Agent, Species> identifiedMap = new HashMap<>();
     /* PlayerInfoリスト（自分自身は除く） */
     private List<PlayerInfo> playerInfoList = new ArrayList<>();
     /* 人狼メンバーリスト */
     private List<Agent> werewolfList = new ArrayList<>();
+    /* 追放されたエージェントリスト */
+    private List<Agent> executedAgentList = new ArrayList<>();
+    /* 襲撃されたエージェントリスト */
+    private List<Agent> attackedAgentList = new ArrayList<>();
 
     // Getter
     public AbstractRole getAssignRole() {
@@ -34,22 +38,28 @@ public class BoardSurface {
     public Agent getMe() {
         return me;
     }
-    public Map<Agent, Species> getDivinedResultMap() {
-        return divinedResultMap;
+    public Map<Agent, Species> getDivinedMap() {
+        return divinedMap;
     }
     public List<Agent> getWerewolfList() {
         return werewolfList;
     }
     public Map<Agent, Species> getMediumResultMap() {
-        return mediumResultMap;
+        return identifiedMap;
     }
 
     // Setter
-    public void putDivinedResultMap(Agent target, Species result) {
-        divinedResultMap.put(target, result);
+    public void putDivinedMap(Agent target, Species result) {
+        divinedMap.put(target, result);
     }
-    public void putMediumResultMap(Agent target, Species result) {
-        mediumResultMap.put(target, result);
+    public void putIdentifiedMap(Agent target, Species result) {
+        identifiedMap.put(target, result);
+    }
+    public void addExecutedAgentList(Agent executedAgent) {
+        executedAgentList.add(executedAgent);
+    }
+    public void addAttackedAgentList(Agent attackedAgent) {
+        attackedAgentList.add(attackedAgent);
     }
 
     /**
@@ -57,12 +67,12 @@ public class BoardSurface {
      * @param agent カミングアウトしたエージェント
      * @param role カミングアウトした役職
      */
-    public void addComingoutRole (Agent agent, Role role) {
+    public void addCoRole(Agent agent, Role role) {
         PlayerInfo playerInfo = getPlayerInfo(agent);
         if (playerInfo != null) {
             playerInfo.addComingoutRole(role);
         } else {
-            Log.warn("addComingoutRoleで渡された引数は不正です．agent: " + agent);
+            Log.warn("addCoRoleで渡された引数は不正です．agent: " + agent);
         }
     }
 
@@ -119,10 +129,9 @@ public class BoardSurface {
      * このリストは　まだ占われていない　かつ　生存しているプレイヤを返す
      * @return 占える対象かつ，占っていないエージェントのリスト
      */
-    public List<Agent> getCandidateDivinedAgentList () {
+    public List<Agent> getCandidateDivinedAgentList (List<Agent> aliveAgentList) {
         List<Agent> candidateAgentList = new ArrayList<>();
         List<Agent> yetDivinedAgentList = getYetDivinedAgentList();
-        List<Agent> aliveAgentList = getAliveAgentList();
         yetDivinedAgentList.forEach(agent -> {
             if (aliveAgentList.contains(agent)) {
                 candidateAgentList.add(agent);
@@ -159,7 +168,7 @@ public class BoardSurface {
      * @return submitで指定したエージェントが発言した占い結果
      */
 
-    public Map<Agent, Species> getDivinedResult (Agent submit) {
+    public Map<Agent, Species> getDivinedMap (Agent submit) {
         PlayerInfo playerInfo = getPlayerInfo(submit);
         if (playerInfo != null) {
             return playerInfo.getDivMap();
@@ -175,7 +184,7 @@ public class BoardSurface {
      * @return submitで指定したエージェントが発言した霊能結果
      */
 
-    public Map<Agent,Species> getIdenResult(Agent submit) {
+    public Map<Agent,Species> getIdenMap(Agent submit) {
         PlayerInfo playerInfo = getPlayerInfo(submit);
         if (playerInfo != null) {
             return playerInfo.getIdenMap();
@@ -187,59 +196,49 @@ public class BoardSurface {
 
     /**
      * 占い結果を保管
-     * @param agent
-     * @param target
-     * @param result
+     * @param agent　占い結果を出したエージェント
+     * @param target 占い先エージェント
+     * @param result 占い結果
      */
-    public void addDivMap (Agent agent, Agent target, Species result) {
+    public void putDivinedMap(Agent agent, Agent target, Species result) {
         PlayerInfo playerInfo = getPlayerInfo(agent);
         playerInfo.putDivMap(target, result);
         // 占いCOしていることを確認　していなければ，占いCOとする
         if (!playerInfo.isComingoutRole(Role.SEER)) {
-            addComingoutRole(agent, Role.SEER);
+            addCoRole(agent, Role.SEER);
         }
     }
 
     /**
      * 霊能結果を保管
-     * @param agent
-     * @param target
-     * @param result
+     * @param agent 霊能結果を出したエージェント
+     * @param target 霊能先エージェント
+     * @param result 霊能結果
      */
-    public void addIdenMap (Agent agent, Agent target, Species result) {
+    public void putIdentifiedMap (Agent agent, Agent target, Species result) {
         PlayerInfo playerInfo = getPlayerInfo(agent);
         playerInfo.putIdenMap(target, result);
         // 占いCOしていることを確認　していなければ，霊能COとする
         if (!playerInfo.isComingoutRole(Role.MEDIUM)) {
-            addComingoutRole(agent, Role.MEDIUM);
+            addCoRole(agent, Role.MEDIUM);
         }
     }
 
     /**
      * 投票先発言を保管
-     * @param submit
-     * @param target
+     * @param submit 投票先発言をしたエージェント
+     * @param target 投票先エージェント
      */
     public void addVote(Agent submit, Agent target) {
         PlayerInfo playerInfo = getPlayerInfo(submit);
-        playerInfo.addVoteList(target);
+        if (playerInfo != null) {
+            playerInfo.addVoteList(target);
+        } else {
+            Log.warn("addVoteに不正な引数が渡されました．submit: " + submit);
+        }
     }
 
-    /**
-     * 追放されたエージェントを保管
-     * @param executedAgent
-     */
-    public void executedAgent(Agent executedAgent) {
-        getPlayerInfo(executedAgent).setExecuted(true);
-    }
 
-    /**
-     * 襲撃されたエージェントを保管
-     * @param attackedAgent
-     */
-    public void attackedAgent(Agent attackedAgent) {
-        getPlayerInfo(attackedAgent).setAttacked(true);
-    }
     /*
         private
      */
@@ -272,22 +271,6 @@ public class BoardSurface {
     }
 
     /**
-     * 生存しているプレイヤーを返す
-     *
-     * @return
-     */
-    private List<Agent> getAliveAgentList() {
-        List<Agent> aliveAgentList = new ArrayList<>();
-        for (PlayerInfo playerInfo :
-                playerInfoList) {
-            if (!playerInfo.isAttacked() && !playerInfo.isExecuted()) {
-                aliveAgentList.add(playerInfo.getAgent());
-            }
-        }
-        return aliveAgentList;
-    }
-
-    /**
      * まだ占われていないエージェントのリストを返す
      * 　（襲撃されたエージェント，追放されたエージェントを含む）
      * @return
@@ -298,7 +281,7 @@ public class BoardSurface {
         List<Agent> participantAgentList = getParticipantAgentList();   // 参加者エージェントリスト
         for (Agent participantAgent :
                 participantAgentList) {
-            if (!divinedResultMap.containsKey(participantAgent)) {  // まだ占われていないならリスト追加
+            if (!divinedMap.containsKey(participantAgent)) {  // まだ占われていないならリスト追加
                 yetDivinedAgentList.add(participantAgent);
             }
         }
