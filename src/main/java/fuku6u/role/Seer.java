@@ -18,14 +18,14 @@ public class Seer extends AbstractRole {
 
     @Override
     public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect) {
-        Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.SEER);  // CO
+        Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.SEER, "ボクは占い師！");  // CO
         Judge divination = gameInfo.getDivineResult();
         if (divination != null) {
             Agent target = divination.getTarget();
             Species result = divination.getResult();
             bs.putDivinedMap(target, result);     // 占い結果を保管
 
-            Utterance.getInstance().offer(Topic.DIVINED, target, result);   // 「targetを占った結果resultだった」
+            Utterance.getInstance().offer(Topic.DIVINED, target, result, target + "を占った結果は" + result + "だよ！");   // 「targetを占った結果resultだった」
         }
     }
 

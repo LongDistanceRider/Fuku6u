@@ -32,7 +32,7 @@ public class TalkEndObserver extends Observer{
             if (genuineSeer != null) {
                 wExpect.clearAgent(genuineSeer);
                 pExpect.clearAgent(genuineSeer);
-                Map<Agent, Species> divinedResult = boardSurface.getDivinedResult(genuineSeer);
+                Map<Agent, Species> divinedResult = boardSurface.getDivinedMap(genuineSeer);
                 trustResult(divinedResult);
             }
         }
@@ -42,7 +42,7 @@ public class TalkEndObserver extends Observer{
             if (genuineMedium != null) {
                 wExpect.clearAgent(genuineMedium);
                 pExpect.clearAgent(genuineMedium);
-                Map<Agent, Species> mediumResult = boardSurface.getIdenResult(genuineMedium);
+                Map<Agent, Species> mediumResult = boardSurface.getIdentifiedMap(genuineMedium);
                 trustResult(mediumResult);
             }
         }

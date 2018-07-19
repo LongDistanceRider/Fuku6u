@@ -1,6 +1,7 @@
 package fuku6u.player;
 
 import com.sun.xml.internal.xsom.impl.Ref;
+import fuku6u.flag.Flag;
 import fuku6u.log.Log;
 import org.aiwolf.client.lib.*;
 import org.aiwolf.common.data.Agent;
@@ -29,12 +30,16 @@ public class Utterance {
      * @param target
      * @param species
      */
-    public void offer(Topic topic, Agent target, Species species) {
-        switch (topic) {
-            case DIVINED:
-                ContentBuilder builder = new DivinedResultContentBuilder(target, species);
-                offer(new Content(builder).getText());
-                return;
+    public void offer(Topic topic, Agent target, Species species, String nlString) {
+        if (Flag.isNL()) {
+            offer(nlString);
+        } else {
+            switch (topic) {
+                case DIVINED:
+                    ContentBuilder builder = new DivinedResultContentBuilder(target, species);
+                    offer(new Content(builder).getText());
+                    return;
+            }
         }
     }
 
@@ -44,16 +49,20 @@ public class Utterance {
      * @param target
      * @param role
      */
-    public void offer(Topic topic, Agent target, Role role) {
-        switch (topic) {
-            case ESTIMATE:
-                ContentBuilder builder = new EstimateContentBuilder(target, role);
-                offer(new Content(builder).getText());
-                return;
-            case COMINGOUT:
-                ContentBuilder builder2 = new ComingoutContentBuilder(target, role);
-                offer(new Content(builder2).getText());
-                return;
+    public void offer(Topic topic, Agent target, Role role, String nlString) {
+        if (Flag.isNL()) {
+            offer(nlString);
+        } else {
+            switch (topic) {
+                case ESTIMATE:
+                    ContentBuilder builder = new EstimateContentBuilder(target, role);
+                    offer(new Content(builder).getText());
+                    return;
+                case COMINGOUT:
+                    ContentBuilder builder2 = new ComingoutContentBuilder(target, role);
+                    offer(new Content(builder2).getText());
+                    return;
+            }
         }
     }
     /**
@@ -61,12 +70,16 @@ public class Utterance {
      * @param topic
      * @param target
      */
-    public void offer(Topic topic, Agent target) {
-        switch (topic) {
-            case VOTE:
-                ContentBuilder builder = new VoteContentBuilder(target);
-                offer(new Content(builder).getText());
-                return;
+    public void offer(Topic topic, Agent target, String nlString) {
+        if (Flag.isNL()) {
+            offer(nlString);
+        } else {
+            switch (topic) {
+                case VOTE:
+                    ContentBuilder builder = new VoteContentBuilder(target);
+                    offer(new Content(builder).getText());
+                    return;
+            }
         }
     }
 
@@ -76,7 +89,11 @@ public class Utterance {
      * @param utterance
      *  追加したい発言
      */
-    private void offer(String utterance) {
+    public void offer(String utterance) {
+        // 空文字は処理しない
+        if (utterance == "") {
+            return;
+        }
         // 同じ発言を何度もしないように，フラグ管理を施す
         StackTraceElement[] stackTraceElements = (new Throwable()).getStackTrace(); // スタックトレースより呼び出し元情報の取り出し
         String className = stackTraceElements[2].getClassName();    // クラス名取得

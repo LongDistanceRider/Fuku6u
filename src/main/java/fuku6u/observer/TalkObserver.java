@@ -21,9 +21,9 @@ public class TalkObserver extends Observer {
             if (myRole.equals(coRole)) {    // 対抗発見 => 狂狼を確信
                 wExpect.distrustCalc(submit, Parameter.convictionPossessedWerewolf);
                 pExpect.distrustCalc(submit, Parameter.convictionPossessedWerewolf);
-                Utterance.getInstance().offer(Topic.ESTIMATE, submit, Role.POSSESSED);  // 「狂人だと思う」
-                Utterance.getInstance().offer(Topic.ESTIMATE, submit, Role.WEREWOLF);   // 「人狼だと思う」
-                Utterance.getInstance().offer(Topic.VOTE, submit);  // 「submitに投票する」
+                Utterance.getInstance().offer(Topic.ESTIMATE, submit, Role.POSSESSED, submit + "は偽物だよ！騙されないで！");  // 「狂人だと思う」
+                Utterance.getInstance().offer(Topic.ESTIMATE, submit, Role.WEREWOLF, "");   // 「人狼だと思う」
+                Utterance.getInstance().offer(Topic.VOTE, submit, submit + "はボク視点で偽物確定だから投票候補だね。");  // 「submitに投票する」
             }
         }
     }
@@ -37,12 +37,12 @@ public class TalkObserver extends Observer {
                 if (result.equals(Species.WEREWOLF)) { // 自分に黒出しされた
                     wExpect.distrustCalc(seerAgent, Parameter.convictionPossessedWerewolf);    // 黒より
                     pExpect.distrustCalc(seerAgent, Parameter.convictionPossessedWerewolf);    // 狂人の可能性を少しあげる
-                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.POSSESSED);   //「狂人だと思う」
-                    Utterance.getInstance().offer(Topic.VOTE, seerAgent);   // 「VOTE発言」
+                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.POSSESSED, "ボクは人間だよ！" + seerAgent + "は偽物だったんだ。");   //「狂人だと思う」
+                    Utterance.getInstance().offer(Topic.VOTE, seerAgent, "ボクに黒出しした" + seerAgent + "は絶対偽物！みんな" + seerAgent + "に投票しよう！");   // 「VOTE発言」
                     addlieRoleAgentMapList(Role.SEER, seerAgent);   // 嘘つきをリストへ追加
                 } else {    // 白だしされた
                     wExpect.distrustCalc(seerAgent, Parameter.unlikely);   // 白より
-                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.SEER);    //「占い師だと思う」
+                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.SEER, "ボクに白出しした" + seerAgent + "は少し真っぽいかな。");    //「占い師だと思う」
                 }
             }
         } else {    // 自分が人狼である場合 => 占い師は真　かつ　他の占い師は狂人 => (グループから削除) PosessedExpectationに処理を送る
@@ -54,8 +54,8 @@ public class TalkObserver extends Observer {
                     seerCOList.remove(seerAgent);   // 真占い師をリムーブ
                     seerCOList.remove(boardSurface.getWerewolfList());
 
-                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.POSSESSED); // 「狂人だと思う」
-                    Utterance.getInstance().offer(Topic.VOTE, seerAgent);   // 「VOTE発言」
+                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.POSSESSED, seerAgent + "！君は真占い師だと思ってたのに……。偽物なんだね。"); // 「狂人だと思う」
+                    Utterance.getInstance().offer(Topic.VOTE, seerAgent,"残念だけど" + seerAgent + "に投票するしかないかな。");   // 「VOTE発言」
                     if (seerCOList.size() == 1) {
                         pExpect.convictionAgent(seerCOList.get(0));
                     }
@@ -63,7 +63,7 @@ public class TalkObserver extends Observer {
                     if (!boardSurface.getWerewolfList().contains(seerAgent)) {
                         pExpect.convictionAgent(seerAgent);
                     }
-                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.SEER);    //「占い師だと思う」
+                    Utterance.getInstance().offer(Topic.ESTIMATE, seerAgent, Role.SEER, "ボクに白出ししたのは真っぽいよね。");    //「占い師だと思う」
                 }
             }
         }

@@ -28,7 +28,7 @@ public class Possessed extends AbstractRole {
     @Override
     public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect) {
         // TODO 戦略として占い師 COすることが状況を良くするのか，常に白だしするだけでいいのかを考慮する必要がある
-        Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.SEER);  // CO
+        Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.SEER, "ボクは占い師です！");  // CO
         //  ----- 占い結果を作成する -----
         List<Agent> candidatesAgentList = gameInfo.getAliveAgentList();
         candidatesAgentList.remove(bs.getMe());
@@ -42,7 +42,7 @@ public class Possessed extends AbstractRole {
             // 占い結果を保管
             divinedMap.put(target, Species.HUMAN);
             // 占い結果を発言
-            Utterance.getInstance().offer(Topic.DIVINED, target, Species.HUMAN);    // 「targetを占った結果白だった」
+            Utterance.getInstance().offer(Topic.DIVINED, target, Species.HUMAN, target + "を占った結果は人間だったよ！");    // 「targetを占った結果白だった」
         }
     }
 

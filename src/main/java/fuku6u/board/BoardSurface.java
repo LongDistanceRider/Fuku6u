@@ -44,7 +44,7 @@ public class BoardSurface {
     public List<Agent> getWerewolfList() {
         return werewolfList;
     }
-    public Map<Agent, Species> getMediumResultMap() {
+    public Map<Agent, Species> getIdentifiedMap() {
         return identifiedMap;
     }
 
@@ -184,7 +184,7 @@ public class BoardSurface {
      * @return submitで指定したエージェントが発言した霊能結果
      */
 
-    public Map<Agent,Species> getIdenMap(Agent submit) {
+    public Map<Agent,Species> getIdentifiedMap(Agent submit) {
         PlayerInfo playerInfo = getPlayerInfo(submit);
         if (playerInfo != null) {
             return playerInfo.getIdenMap();

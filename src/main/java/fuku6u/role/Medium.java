@@ -19,14 +19,14 @@ public class Medium extends AbstractRole {
     @Override
     public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect) {
         // とりあえずロケットCOしておく
-        Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.MEDIUM);  // CO
+        Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.MEDIUM, "ボクは霊能者だよ。");  // CO
         Judge medium = gameInfo.getMediumResult();
         if (medium != null) {
             Agent target = medium.getTarget();
             Species result = medium.getResult();
             bs.putIdentifiedMap(target, result);  // 霊能結果を保管
 
-            Utterance.getInstance().offer(Topic.IDENTIFIED, target, result);
+            Utterance.getInstance().offer(Topic.IDENTIFIED, target, result, "霊能結果は" + result + "だったよ。");
         }
     }
 

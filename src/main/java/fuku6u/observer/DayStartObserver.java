@@ -34,23 +34,23 @@ public class DayStartObserver extends Observer {
         for (Agent seerCOAgent :
                 boardSurface.getComingOutAgentList(Role.SEER)) {  // 占い師COしたエージェント
             for (Map.Entry<Agent, Species> divinedResult:
-                    boardSurface.getDivinedResult(seerCOAgent).entrySet()) { // 占い結果
+                    boardSurface.getDivinedMap(seerCOAgent).entrySet()) { // 占い結果
                 if (divinedResult.getKey().equals(attackedAgent) && divinedResult.getValue().equals(Species.WEREWOLF)) {    // 襲撃されたプレイヤに対して黒判定を出していた場合
                     // 嘘つきをリスト追加
                     addlieRoleAgentMapList(Role.SEER, seerCOAgent);
                     wExpect.distrustCalc(seerCOAgent, Parameter.convictionPossessedWerewolf);   // 狂狼を確信
                     pExpect.distrustCalc(seerCOAgent, Parameter.convictionPossessedWerewolf);  // ほぼ狂もしかしたら狼を確信
 
-                    Utterance.getInstance().offer(Topic.ESTIMATE, seerCOAgent, Role.WEREWOLF);  // 「狼だと思う」
-                    Utterance.getInstance().offer(Topic.ESTIMATE, seerCOAgent, Role.POSSESSED);  // 「狂人だと思う」
-                    Utterance.getInstance().offer(Topic.VOTE, seerCOAgent); // 「VOTE発言」
+                    Utterance.getInstance().offer(Topic.ESTIMATE, seerCOAgent, Role.WEREWOLF, seerCOAgent + "って" + attackedAgent + "に白出ししてたよね？なのに噛まれたってことは...偽物か！");  // 「狼だと思う」
+                    Utterance.getInstance().offer(Topic.ESTIMATE, seerCOAgent, Role.POSSESSED, "");  // 「狂人だと思う」
+                    Utterance.getInstance().offer(Topic.VOTE, seerCOAgent, seerCOAgent + "は偽物確信してるから投票しよっかな．"); // 「VOTE発言」
                 }
             }
         }
         // 自分の役職が霊能者の場合，結果を受けて人狼予想をする．また，黒出しされたプレイヤが占い師COしている場合は，全ての占い結果をバックトラックする．
         if (boardSurface.getAssignRole().getRole().equals(Role.MEDIUM)) {
             // 判定によって人狼グループ予想クラスの処理をする
-            Map<Agent, Species> mediumResultMap = boardSurface.getMediumResultMap();    // 自分自身の霊能結果
+            Map<Agent, Species> mediumResultMap = boardSurface.getIdentifiedMap();    // 自分自身の霊能結果
             mediumResultMap.forEach(((agent, species) -> {
                 if (species.equals(Species.HUMAN)) {
                     wExpect.clearAgent(agent);
@@ -61,7 +61,7 @@ public class DayStartObserver extends Observer {
                         // 偽物確定
                         addlieRoleAgentMapList(Role.SEER, agent);
                         // 発言した占い結果による影響をバックトラック
-                        Map<Agent, Species> lieSeerDivinedResult = boardSurface.getDivinedResult(agent);
+                        Map<Agent, Species> lieSeerDivinedResult = boardSurface.getDivinedMap(agent);
                         lieSeerDivinedResult.forEach((target_lie, species_lie) -> {
                             // 白を出されたエージェント（自分以外）は白寄りに なっているため，これを逆算
                             if (!target_lie.equals(boardSurface.getMe())) {
@@ -90,7 +90,7 @@ public class DayStartObserver extends Observer {
                         // 偽物確定
                         addlieRoleAgentMapList(Role.MEDIUM, agent);
                         // 発言した霊能結果による影響をバックトラック
-                        Map<Agent, Species> lieIdentifiedResult = boardSurface.getIdenResult(agent);
+                        Map<Agent, Species> lieIdentifiedResult = boardSurface.getIdentifiedMap(agent);
                         lieIdentifiedResult.forEach((target_lie, species_lie) -> {
                             // 白を出されたエージェント（自分以外）は白寄りに なっているため，これを逆算
                             if (!target_lie.equals(boardSurface.getMe())) {
