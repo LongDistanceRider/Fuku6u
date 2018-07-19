@@ -1,11 +1,13 @@
 package fuku6u.player;
 
+import com.sun.jmx.remote.internal.ArrayQueue;
 import fuku6u.board.Util;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Player;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,7 +17,7 @@ import static java.lang.Math.random;
 public class Dammy implements Player {
 
     GameInfo gameInfo;
-    List<String> talkList = new ArrayList<>();
+    ArrayDeque<String> talkList = new ArrayDeque<>();
 
     @Override
     public String getName() {
@@ -29,11 +31,10 @@ public class Dammy implements Player {
 
     @Override
     public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
-        talkList.add("私が占い師だからAgent[02]さんが裏切り者だと思うわ");
-        talkList.add("今日の占い結果はAgent[03]さんが人間だったよ");
-        talkList.add("今日はAgent[04]に投票しよう");
-        talkList.add("楽しそう！");
-        talkList.add("今日襲われるのは僕だよね。いやだなぁ");
+        talkList.add("Agent[01]が人狼じゃないのはわかってるんだよね");
+        talkList.add("人狼COするね！");
+        talkList.add("Agent[03]がいない！食べられちゃったのかな");
+        talkList.add("人狼ってチャットでもできるよ");
     }
 
 
@@ -47,8 +48,9 @@ public class Dammy implements Player {
         double randomInteger =  Math.random();
         int day = gameInfo.getDay();
         if (day == 1) {
-            if (randomInteger < 3) {
-                return Util.randomElementSelect(talkList);
+            if (randomInteger < 0.5) {
+                String talkString = talkList.poll();
+                return talkString;
             }
         }
         return "Over";

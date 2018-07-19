@@ -172,10 +172,11 @@ public class NlProcessing {
                 }
             }
 
-            Log.trace("最大ユークリッド距離獲得照合ファイル文: " + maxComparisonEntry.getKey() + " 距離: " + maxDistance);
             // 距離がDISTANCE_THRESHOLD以下は変換不可能とする
-            if (maxDistance < DISTANCE_THRESHOLD) {
-                Log.trace("ユークリッド距離不足:: 距離: " + maxDistance + " sentence: " + sentence + " convertToTag: " + convertToTag);
+            if (maxDistance > DISTANCE_THRESHOLD) {
+                Log.trace("最大ユークリッド距離獲得照合ファイル文: " + maxComparisonEntry.getKey() + " 距離: " + maxDistance);
+            } else {
+                Log.trace("ユークリッド距離不足．最大ユークリッド距離獲得照合ファイル文:" + maxComparisonEntry.getKey() + " 距離: " + maxDistance);
                 continue;
             }
             // 照合ファイルから話題を取って来た後，各話題の処理を行う
@@ -265,16 +266,6 @@ public class NlProcessing {
                             break;
                         }
                         break;
-                    case "IMPOSSIBLE":
-                        // <TARGET>照合
-                        target = getTargetString(text, Integer.parseInt(topics[i+1]));
-                        if (target != null) {
-                            // TODO NL話題の処理をここに書く
-                        } else {
-                            Log.warn("IMPOSSIBLE変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
-                            break;
-                        }
-                        break;
                     case "LIAR":
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
@@ -304,6 +295,12 @@ public class NlProcessing {
                             Log.warn("TRUST変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
                         }
+                        break;
+                    case "IMPOSSIBLE":  // 現在の手法では取り扱うことができない話題
+                        Log.trace("IMPOSSIBLE話題です．");
+                        break;
+                    case "NO_REQUIRED": // 処理不要な話題
+                        Log.trace("NO_REQUIRED話題です．");
                         break;
                     default:
                         Log.warn("想定していないSwitch-defaultに分岐しました．sentence: " + sentence + " topics[i]" + topics[i]);

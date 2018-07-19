@@ -1,6 +1,5 @@
 package fuku6u.player;
 
-import com.sun.xml.internal.xsom.impl.Ref;
 import fuku6u.flag.Flag;
 import fuku6u.log.Log;
 import org.aiwolf.client.lib.*;
