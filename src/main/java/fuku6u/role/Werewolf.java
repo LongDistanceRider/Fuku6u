@@ -24,8 +24,6 @@ public class Werewolf extends AbstractRole {
     private Map<Agent, Species> divinedMap = new HashMap<>();
     /* 人狼メンバー */
     private List<Agent> werewolfList = new ArrayList<>();
-    /* PP発生 */
-    private boolean isPP = false;
     /* vote再投票フラグ */
     private boolean isReVote = false;
     /* 前回投票したエージェント（再投票時に利用） */
@@ -132,6 +130,7 @@ public class Werewolf extends AbstractRole {
         // 1.人狼以外に黒出しされているエージェントに投票
         List<Agent> divinedBlackAgentList = boardSurface.getDivinedBlackAgentList();
         List<Agent> tmpCandidateAgentList = candidateAgentList;
+        tmpCandidateAgentList.removeAll(boardSurface.getWerewolfList());
         tmpCandidateAgentList.retainAll(divinedBlackAgentList);    // 候補者 AND 黒出しエージェント　のリストに変換
         if (!tmpCandidateAgentList.isEmpty()) {
             return tmpCandidateAgentList;

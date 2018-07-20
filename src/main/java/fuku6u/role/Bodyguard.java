@@ -7,6 +7,7 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.net.GameInfo;
 
 public class Bodyguard extends AbstractRole {
+
     @Override
     public Role getRole() {
         return Role.BODYGUARD;

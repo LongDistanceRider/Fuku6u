@@ -15,6 +15,9 @@ import java.util.List;
  */
 public abstract class AbstractRole {
 
+    /* PP発生 */
+    protected boolean isPP = false;
+
     public abstract  Role getRole();
 
     public abstract void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect);
