@@ -1,5 +1,6 @@
 package fuku6u.role;
 
+import fuku6u.Expectation.PossessedExpectation;
 import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.player.Utterance;
@@ -17,7 +18,7 @@ public class Medium extends AbstractRole {
     }
 
     @Override
-    public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect) {
+    public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
         // とりあえずロケットCOしておく
         Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.MEDIUM, "ボクは霊能者だよ。");  // CO
         Judge medium = gameInfo.getMediumResult();

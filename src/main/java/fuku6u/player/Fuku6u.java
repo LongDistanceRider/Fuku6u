@@ -69,7 +69,7 @@ public class Fuku6u implements Player {
                 // 役職セット
                 boardSurface.setAssignRole(gameInfo);
                 // 役職固有の処理
-                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wExpect);
+                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wExpect, pExpect);
                 break;
             default: // 2日目以降
                 // 被投票者
@@ -92,7 +92,7 @@ public class Fuku6u implements Player {
                     Log.info("被害者 : なし（GJ発生）");
                 }
                 // 役職固有の処理
-                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wExpect);
+                boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wExpect, pExpect);
                 // 観測クラスの実行
                 DayStartObserver observer = new DayStartObserver(gameInfo, boardSurface, wExpect, pExpect);
                 observer.check(attackedAgent);
@@ -126,7 +126,7 @@ public class Fuku6u implements Player {
         // voteは格役職毎に処理を変えるため，.roleへ処理を移行し，投票先を受け取る
         List<Agent> candidateAgentList = gameInfo.getAliveAgentList();
         candidateAgentList.remove(boardSurface.getMe());
-        List<Agent> votedAgentList = boardSurface.getAssignRole().vote(candidateAgentList, wExpect, pExpect);
+        List<Agent> votedAgentList = boardSurface.getAssignRole().vote(gameInfo.getDay(), boardSurface, candidateAgentList, wExpect, pExpect);
 
         Agent votedAgent = Util.randomElementSelect(votedAgentList);
         Log.info("投票先: " + votedAgent);
@@ -332,7 +332,7 @@ public class Fuku6u implements Player {
 //                case GUARD:
 //                    break;
                         case VOTE:
-                            boardSurface.addVote(talk.getAgent(), content.getTarget()); // 投票先発言を保管
+                            boardSurface.addVote(gameInfo.getDay(), talk.getAgent(), content.getTarget()); // 投票先発言を保管
                             break;
 //                case ATTACK:
 //                    break;

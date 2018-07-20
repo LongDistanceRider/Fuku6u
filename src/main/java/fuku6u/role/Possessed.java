@@ -1,5 +1,6 @@
 package fuku6u.role;
 
+import fuku6u.Expectation.PossessedExpectation;
 import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.board.Util;
@@ -26,7 +27,7 @@ public class Possessed extends AbstractRole {
     }
 
     @Override
-    public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect) {
+    public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
         // TODO 戦略として占い師 COすることが状況を良くするのか，常に白だしするだけでいいのかを考慮する必要がある
         Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.SEER, "ボクは占い師です！");  // CO
         //  ----- 占い結果を作成する -----
@@ -44,6 +45,13 @@ public class Possessed extends AbstractRole {
             // 占い結果を発言
             Utterance.getInstance().offer(Topic.DIVINED, target, Species.HUMAN, target + "を占った結果は人間だったよ！");    // 「targetを占った結果白だった」
         }
+
+        // パワープレイ判定（3人になった場合の判定．人狼COがあった場合のPP判定は別の場所で処理
+        if (gameInfo.getAliveAgentList().size() == 3) {
+            // PP発生
+            Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.POSSESSED, "ご主人様！ボクが狂人だよ！");
+        }
+
     }
 
     @Override

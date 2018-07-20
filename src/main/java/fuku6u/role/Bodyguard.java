@@ -1,5 +1,6 @@
 package fuku6u.role;
 
+import fuku6u.Expectation.PossessedExpectation;
 import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import org.aiwolf.common.data.Role;
@@ -12,7 +13,7 @@ public class Bodyguard extends AbstractRole {
     }
 
     @Override
-    public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect) {
+    public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
 
     }
 

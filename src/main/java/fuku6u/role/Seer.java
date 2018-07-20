@@ -1,5 +1,6 @@
 package fuku6u.role;
 
+import fuku6u.Expectation.PossessedExpectation;
 import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.player.Utterance;
@@ -17,7 +18,8 @@ public class Seer extends AbstractRole {
     }
 
     @Override
-    public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect) {
+    public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
+        // TODO 5人人狼占い結果黒出し作戦を実装
         Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.SEER, "ボクは占い師！");  // CO
         Judge divination = gameInfo.getDivineResult();
         if (divination != null) {

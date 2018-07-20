@@ -18,13 +18,14 @@ public class BoardSurface {
     private Agent me;
     /* 自分自身の役職 */
     private AbstractRole assignRole = null;
-    /* 占い結果 */
+    /* 占い結果 */ // TODO SEERクラスへ移動
     private Map<Agent, Species> divinedMap = new HashMap<>();
-    /* 霊能結果 */
+    /* 霊能結果 */ // TODO MEDIUMクラスへ移動
     private Map<Agent, Species> identifiedMap = new HashMap<>();
     /* PlayerInfoリスト（自分自身は除く） */
     private List<PlayerInfo> playerInfoList = new ArrayList<>();
     /* 人狼メンバーリスト */
+    // TODO Werewolfクラスへ移動
     private List<Agent> werewolfList = new ArrayList<>();
     /* 追放されたエージェントリスト */
     private List<Agent> executedAgentList = new ArrayList<>();
@@ -229,10 +230,10 @@ public class BoardSurface {
      * @param submit 投票先発言をしたエージェント
      * @param target 投票先エージェント
      */
-    public void addVote(Agent submit, Agent target) {
+    public void addVote(int day, Agent submit, Agent target) {
         PlayerInfo playerInfo = getPlayerInfo(submit);
         if (playerInfo != null) {
-            playerInfo.addVoteList(target);
+            playerInfo.addVoteList(day, target);
         } else {
             Log.warn("addVoteに不正な引数が渡されました．submit: " + submit);
         }
@@ -300,6 +301,61 @@ public class BoardSurface {
             return null;
         }
         return selfCoRole.get(selfCoRole.size() - 1);
+    }
+
+    /**
+     * 黒出しされているエージェントのリストを返す
+     * @return 黒出しされているエージェントのリスト
+     */
+    public List<Agent> getDivinedBlackAgentList() {
+        List<Agent> divinedBlackAgentList = new ArrayList<>();
+        List<Agent> seerCoAgentList = getComingOutAgentList(Role.SEER);
+        for (Agent seerCoAgent :
+                seerCoAgentList) {
+            Map<Agent, Species> divinedMap = getPlayerInfo(seerCoAgent).getDivMap();
+            for (Map.Entry<Agent, Species> divinedEntry :
+                    divinedMap.entrySet()) {
+                if (divinedEntry.getValue().equals(Species.WEREWOLF)) {
+                    divinedBlackAgentList.add(divinedEntry.getKey());
+                }
+            }
+        }
+        return divinedBlackAgentList;
+    }
+
+    /**
+     * 最大投票数を得たエージェントリストを返す
+     * @param day 指定された日の投票数をカウントする
+     * @param candidateAgentList この候補者リスト内から最大投票数を得たエージェントリストを返す
+     * @return 最大投票数を得たエージェントリスト
+     */
+    public List<Agent> getMaxVotedAgentList(int day, List<Agent> candidateAgentList) {
+        Map<Agent, Integer> voteCountMap = new HashMap<>();
+        for (PlayerInfo playerInfo :
+                playerInfoList) {
+            List<Agent> voteList = playerInfo.getVoteList(day);
+            voteList.forEach(agent -> {
+                if (candidateAgentList.contains(agent)) {
+                    int count = voteCountMap.getOrDefault(agent, 0);
+                    count++;
+                    voteCountMap.put(agent, count);
+                }
+            });
+        }
+        int maxCount = 0;
+        List<Agent> maxCountAgent = new ArrayList<>();
+        for (Map.Entry<Agent, Integer> voteCountEntry :
+                voteCountMap.entrySet()) {
+            int count = voteCountEntry.getValue();
+            if (count > maxCount) {
+                maxCount = count;
+                maxCountAgent.clear();
+            }
+            if (count == maxCount) {
+                maxCountAgent.add(voteCountEntry.getKey());
+            }
+        }
+        return maxCountAgent;
     }
 
 //    /**

@@ -19,18 +19,22 @@ class PlayerInfo {
     /* 霊能結果リスト */
     private Map<Agent, Species> idenMap = new HashMap<>();
     /* 投票先発言リスト */
-    private List<Agent> voteList = new ArrayList<>();
+    private Map<Integer, List<Agent>> voteListDayMap = new HashMap<>();
 
-    public Agent getAgent() {
+    Agent getAgent() {
         return agent;
     }
 
-    public List<Role> getSelfCO() {
+    List<Role> getSelfCO() {
         return selfCO;
     }
 
-    public Map<Agent, Species> getDivMap() {
+    Map<Agent, Species> getDivMap() {
         return divMap;
+    }
+
+    List<Agent> getVoteList(int day) {
+        return voteListDayMap.get(day);
     }
 
     /**
@@ -79,8 +83,10 @@ class PlayerInfo {
      * @param target
      *  投票先エージェント
      */
-    public void addVoteList(Agent target) {
+    public void addVoteList(int day, Agent target) {
+        List<Agent> voteList = voteListDayMap.get(day);
         voteList.add(target);
+        voteListDayMap.put(day, voteList);
     }
 
     public Map<Agent, Species> getIdenMap() {

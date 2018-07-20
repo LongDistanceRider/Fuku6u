@@ -17,7 +17,7 @@ public abstract class AbstractRole {
 
     public abstract  Role getRole();
 
-    public abstract void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect);
+    public abstract void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect);
 
     public abstract  void talk(BoardSurface boardSurface);
 
@@ -32,7 +32,7 @@ public abstract class AbstractRole {
      * 同数の場合は複数のエージェントを返す
      * 全てのエージェントの疑い度が0の場合はnullが返却される
      */
-    public List<Agent> vote(List<Agent> candidateAgentList, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
+    public List<Agent> vote(int day, BoardSurface boardSurface, List<Agent> candidateAgentList, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
         // 人狼の可能性が高いエージェントを返す　
         List<Agent> maxDistrustAgent = wExpect.getMaxDistrustAgent(candidateAgentList);
         if (!maxDistrustAgent.isEmpty()) {
