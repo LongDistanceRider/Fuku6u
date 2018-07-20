@@ -13,10 +13,7 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
 import org.aiwolf.common.net.GameInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 人狼は狂人と同じく占い師COする戦略
@@ -24,11 +21,15 @@ import java.util.Map;
 public class Werewolf extends AbstractRole {
 
     /* 占い結果 */
-    Map<Agent, Species> divinedMap = new HashMap<>();
+    private Map<Agent, Species> divinedMap = new HashMap<>();
     /* 人狼メンバー */
-    List<Agent> werewolfList = new ArrayList<>();
+    private List<Agent> werewolfList = new ArrayList<>();
     /* PP発生 */
     private boolean isPP = false;
+    /* vote再投票フラグ */
+    private boolean isReVote = false;
+    /* 前回投票したエージェント（再投票時に利用） */
+    private Agent preVoteAgent;
 
     @Override
     public Role getRole() {
@@ -77,31 +78,57 @@ public class Werewolf extends AbstractRole {
 
     @Override
     public void finish(BoardSurface boardSurface) {
+        isPP = false;
+        preVoteAgent = null;
 
     }
     // TODO vote()をオーバーライドして人狼用に書き換えること
 
     @Override
     public List<Agent> vote(int day, BoardSurface boardSurface, List<Agent> candidateAgentList, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
-        List<Agent> ppCandidateAgentList = candidateAgentList;
-        // 人狼仲間への投票は無しにする
-        ppCandidateAgentList.removeAll(boardSurface.getWerewolfList());
-        // PP発生時は狂人COしていないエージェント（または狂人の可能性が低いエージェント）に投票する
-        if (isPP) {
+        if (isPP) { // PP発生時
+            // 狂人COしているAgentを取得
             List<Agent> possessedCoAgentList = boardSurface.getComingOutAgentList(Role.POSSESSED);
-            if (!possessedCoAgentList.isEmpty()) {
-                ppCandidateAgentList.removeAll(possessedCoAgentList); // 狂人COしていないエージェントリスト
-            } else {    // 狂人COしたエージェントが存在しない場合
-                List<Agent> maxDistrustAgentList = pExpect.getMaxDistrustAgent(ppCandidateAgentList);
-                ppCandidateAgentList.removeAll(maxDistrustAgentList);
-                if (!ppCandidateAgentList.isEmpty()) {
-                    return ppCandidateAgentList;    // 狂人っぽい人を除いたエージェントを返す
+            // 人狼COしているAgentを取得
+            List<Agent> werewolfCoAgentList = boardSurface.getComingOutAgentList(Role.WEREWOLF);
+            // 狂狼COしているAgentリスト
+            List<Agent> roleCoAgentList = new ArrayList<>();
+            roleCoAgentList.addAll(possessedCoAgentList);
+            roleCoAgentList.addAll(werewolfCoAgentList);
+            roleCoAgentList.retainAll(candidateAgentList);
+            // 人狼仲間を除く
+            roleCoAgentList.removeAll(boardSurface.getWerewolfList());
+            // 狂狼COしているAgentが1人か
+            if (roleCoAgentList.size() == 1) {
+                // 狂狼COしていないAgentに投票
+                List<Agent> ppCandidateAgentList = candidateAgentList;
+                // 人狼仲間は除く
+                ppCandidateAgentList.removeAll(boardSurface.getWerewolfList());
+                ppCandidateAgentList.removeAll(roleCoAgentList);
+                if (preVoteAgent == null) { // 再投票時に別エージェントに投票するように処理をする
+                    preVoteAgent = Util.randomElementSelect(ppCandidateAgentList);
+                    return Arrays.asList(preVoteAgent);
+                } else {
+                    return roleCoAgentList;
+                }
+            } else if (roleCoAgentList.size() == 2) {
+                if (preVoteAgent == null) {
+                    // 狂人の可能性が低い方に投票する
+                    int distrust1 = pExpect.getAgentDistrust(roleCoAgentList.get(0));
+                    int distrust2 = pExpect.getAgentDistrust(roleCoAgentList.get(1));
+                    if (distrust1 < distrust2) {
+                        preVoteAgent = roleCoAgentList.get(0);
+                    } else {
+                        preVoteAgent = roleCoAgentList.get(1);
+                    }
+                    return Arrays.asList(preVoteAgent);
+                } else {
+                    roleCoAgentList.remove(preVoteAgent);
+                    return roleCoAgentList;
                 }
             }
-            Log.warn("PP発生しているが，狂人を見つけられないため，適当なプレイヤに投票する．");
-            return ppCandidateAgentList;
-
         }
+
         // 1.人狼以外に黒出しされているエージェントに投票
         List<Agent> divinedBlackAgentList = boardSurface.getDivinedBlackAgentList();
         List<Agent> tmpCandidateAgentList = candidateAgentList;
