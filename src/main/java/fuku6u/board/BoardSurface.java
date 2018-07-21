@@ -335,12 +335,14 @@ public class BoardSurface {
         for (PlayerInfo playerInfo :
                 playerInfoList) {
             List<Agent> voteList = playerInfo.getVoteList(day);
-            for (Agent agent :
-                    voteList) {
-                if (candidateAgentList.contains(agent)) {
-                    int count = voteCountMap.getOrDefault(agent, 0);
-                    count++;
-                    voteCountMap.put(agent, count);
+            if (voteList != null) {
+                for (Agent agent :
+                        voteList) {
+                    if (candidateAgentList.contains(agent)) {
+                        int count = voteCountMap.getOrDefault(agent, 0);
+                        count++;
+                        voteCountMap.put(agent, count);
+                    }
                 }
             }
         }

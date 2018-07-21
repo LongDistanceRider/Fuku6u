@@ -84,7 +84,7 @@ class PlayerInfo {
      *  投票先エージェント
      */
     public void addVoteList(int day, Agent target) {
-        List<Agent> voteList = voteListDayMap.get(day);
+        List<Agent> voteList = voteListDayMap.getOrDefault(day, new ArrayList<>());
         voteList.add(target);
         voteListDayMap.put(day, voteList);
     }

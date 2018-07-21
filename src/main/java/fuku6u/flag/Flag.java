@@ -11,10 +11,10 @@ import fuku6u.log.LogLevel;
 public class Flag {
 
     /* 自然言語処理を行うか */
-    private static final boolean nl = true;
+    private static final boolean nl = false;
 
     /* Logを書き出す最大レベル */
-    private static final LogLevel maxLogLevel = LogLevel.TRACE;
+    private static final LogLevel maxLogLevel = LogLevel.WARN;
 
     public static boolean isNL() {
         return nl;
