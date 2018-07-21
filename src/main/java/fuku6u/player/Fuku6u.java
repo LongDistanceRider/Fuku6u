@@ -25,6 +25,8 @@ public class Fuku6u implements Player {
 
     /* ゲーム情報 */
     private GameInfo gameInfo;
+    /* ゲーム設定 */
+    private GameSetting gameSetting;
     /* 盤面 */
     private BoardSurface boardSurface;
     /* 人狼グループ */
@@ -36,11 +38,13 @@ public class Fuku6u implements Player {
     /* トークリストをどこまで読み込んだか */
     private static int talkListHead = 0;
 
+
     @Override
     public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
         Log.startLog();
         Log.debug("initialize()実行");
         this.gameInfo = gameInfo;
+        this.gameSetting = gameSetting;
         boardSurface = new BoardSurface(gameInfo);
         wExpect = new WolfGroupExpectation(gameInfo);
         pExpect = new PossessedExpectation();
@@ -67,7 +71,7 @@ public class Fuku6u implements Player {
                 return;
             case 1: // 1日目
                 // 役職セット
-                boardSurface.setAssignRole(gameInfo);
+                boardSurface.setAssignRole(gameInfo, gameSetting);
                 // 役職固有の処理
                 boardSurface.getAssignRole().dayStart(gameInfo, boardSurface, wExpect, pExpect);
                 break;

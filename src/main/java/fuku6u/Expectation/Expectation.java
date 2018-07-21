@@ -37,6 +37,11 @@ public abstract class Expectation {
      */
     public abstract int getAgentDistrust(Agent agent);
 
+    /**
+     * エージェントの疑い度の高いエージェントを返す
+     * @param agentList 疑い度を調べるエージェントのリスト
+     * @return 最大の疑い度のあるエージェントのリストを返す
+     */
     public List<Agent> getMaxDistrustAgent(List<Agent> agentList) {
         List<Agent> maxDistrustAgentList = new ArrayList<>();
         int maxDistrust = 0;

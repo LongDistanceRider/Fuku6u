@@ -125,4 +125,36 @@ public class Utterance {
         public static final Utterance INSTANCE = new Utterance();
     }
     /* *** *** */
+
+    /**
+     * Speciesを自然言語に変換
+     * @param species
+     * @return
+     */
+    public static String convertSpeciesToNl (Species species) {
+        if (species.equals(Species.HUMAN)) {
+            return "人間";
+        }
+        return "人狼";
+    }
+
+    /**
+     * Roleを自然言語に変換
+     */
+    public static String convertRoleToNl (Role role) {
+        switch (role) {
+            case SEER:
+                return "占い師";
+            case MEDIUM:
+                return "霊能者";
+            case BODYGUARD:
+                return "狩人";
+            case POSSESSED:
+                return "裏切り者";
+            case WEREWOLF:
+                return "人狼";
+            default:
+                return "村人";
+        }
+    }
 }

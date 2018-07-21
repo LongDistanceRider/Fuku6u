@@ -6,6 +6,7 @@ import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
 import org.aiwolf.common.net.GameInfo;
+import org.aiwolf.common.net.GameSetting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,12 +95,12 @@ public class BoardSurface {
      * 役職をセット
      * @param gameInfo gameInfo
      */
-    public void setAssignRole(GameInfo gameInfo) {
+    public void setAssignRole(GameInfo gameInfo, GameSetting gameSetting) {
         Role role = gameInfo.getRole();
         Log.info("MyRole: " + role);
         switch (role) {
             case SEER:
-                assignRole = new Seer();
+                assignRole = new Seer(gameSetting);
                 break;
             case MEDIUM:
                 assignRole = new Medium();
