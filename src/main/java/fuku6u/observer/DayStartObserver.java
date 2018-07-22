@@ -57,7 +57,8 @@ public class DayStartObserver extends Observer {
                 } else {
                     wExpect.convictionAgent(agent);
                     // 占い師COしていたか
-                    if (boardSurface.getCoRole(agent).equals(Role.SEER)) {
+                    Role coRole = boardSurface.getCoRole(agent);
+                    if (coRole != null && coRole.equals(Role.SEER)) {
                         // 偽物確定
                         addlieRoleAgentMapList(Role.SEER, agent);
                         // 発言した占い結果による影響をバックトラック
@@ -86,7 +87,8 @@ public class DayStartObserver extends Observer {
                 } else {
                     wExpect.convictionAgent(agent);
                     // 霊能COしていたか
-                    if (boardSurface.getCoRole(agent).equals(Role.MEDIUM)) {
+                    Role coRole = boardSurface.getCoRole(agent);
+                    if (coRole != null && coRole.equals(Role.MEDIUM)) {
                         // 偽物確定
                         addlieRoleAgentMapList(Role.MEDIUM, agent);
                         // 発言した霊能結果による影響をバックトラック
