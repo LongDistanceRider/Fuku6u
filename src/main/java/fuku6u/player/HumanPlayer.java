@@ -1,38 +1,29 @@
 package fuku6u.player;
 
-import com.sun.jmx.remote.internal.ArrayQueue;
-import fuku6u.board.Util;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Player;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-import static java.lang.Math.random;
-
-public class Dammy implements Player {
-
-    GameInfo gameInfo;
-    ArrayDeque<String> talkList = new ArrayDeque<>();
-
+public class HumanPlayer implements Player {
     @Override
     public String getName() {
-        return "Dammy";
+        return "HumanPlayer";
     }
 
     @Override
     public void update(GameInfo gameInfo) {
-        this.gameInfo = gameInfo;
+
     }
 
     @Override
     public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
-    }
 
+    }
 
     @Override
     public void dayStart() {
@@ -41,15 +32,21 @@ public class Dammy implements Player {
 
     @Override
     public String talk() {
-        double randomInteger =  Math.random();
-        int day = gameInfo.getDay();
-        if (day == 1) {
-            if (randomInteger < 0.5) {
-                String talkString = talkList.poll();
-                return talkString;
-            }
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        return "Over";
+        String talk_String = null;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            System.out.print("TALK: ");
+            talk_String = reader.readLine();
+//            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return talk_String;
     }
 
     @Override
@@ -82,4 +79,3 @@ public class Dammy implements Player {
 
     }
 }
-

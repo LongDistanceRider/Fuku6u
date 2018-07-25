@@ -10,6 +10,7 @@ import fuku6u.observer.DayStartObserver;
 import fuku6u.observer.TalkEndObserver;
 import fuku6u.observer.TalkObserver;
 import fuku6u.player.nl.NlProcessing;
+import fuku6u.utterance.Utterance;
 import org.aiwolf.client.lib.Content;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Player;

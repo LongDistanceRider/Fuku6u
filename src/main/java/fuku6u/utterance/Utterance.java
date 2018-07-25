@@ -1,4 +1,4 @@
-package fuku6u.player;
+package fuku6u.utterance;
 
 import fuku6u.flag.Flag;
 import fuku6u.log.Log;

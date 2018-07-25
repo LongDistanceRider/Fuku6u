@@ -5,7 +5,7 @@ import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.board.Util;
 import fuku6u.log.Log;
-import fuku6u.player.Utterance;
+import fuku6u.utterance.Utterance;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
@@ -28,6 +28,7 @@ public class Possessed extends AbstractRole {
 
     @Override
     public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
+
         // TODO 戦略として占い師 COすることが状況を良くするのか，常に白だしするだけでいいのかを考慮する必要がある
         Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.SEER, "ボクは占い師です！");  // CO
         //  ----- 占い結果を作成する -----

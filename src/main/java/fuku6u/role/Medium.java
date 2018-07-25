@@ -3,7 +3,7 @@ package fuku6u.role;
 import fuku6u.Expectation.PossessedExpectation;
 import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
-import fuku6u.player.Utterance;
+import fuku6u.utterance.Utterance;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Judge;
