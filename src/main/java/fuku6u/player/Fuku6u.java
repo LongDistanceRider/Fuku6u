@@ -43,7 +43,7 @@ public class Fuku6u implements Player {
     @Override
     public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
         Log.startLog();
-        Log.debug("initialize()実行");
+        Log.trace("initialize()実行");
         this.gameInfo = gameInfo;
         this.gameSetting = gameSetting;
         boardSurface = new BoardSurface(gameInfo);
@@ -54,7 +54,7 @@ public class Fuku6u implements Player {
 
     @Override
     public void update(GameInfo gameInfo) {
-        Log.debug("update()実行");
+        Log.trace("update()実行");
         this.gameInfo = gameInfo;
         // 発言処理
         talkProcessing();
@@ -62,7 +62,7 @@ public class Fuku6u implements Player {
 
     @Override
     public void dayStart() {
-        Log.debug("dayStart()実行");
+        Log.trace("dayStart()実行");
         Log.info("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
         Log.info("\t" + gameInfo.getDay() + "day start : My number is " + gameInfo.getAgent().toString());
         Log.info("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
@@ -106,7 +106,7 @@ public class Fuku6u implements Player {
 
     @Override
     public String talk() {
-        Log.debug("talk()実行");
+        Log.trace("talk()実行");
         boardSurface.getAssignRole().talk(boardSurface);    // 役職としての発言（CO，占い結果発言，霊能結果発言など）
         String talk = Utterance.getInstance().poll();
         if (talk != null) {
@@ -117,13 +117,13 @@ public class Fuku6u implements Player {
 
     @Override
     public String whisper() {
-        Log.debug("whisper()実行");
+        Log.trace("whisper()実行");
         return null;
     }
 
     @Override
     public Agent vote() {
-        Log.debug("vote()実行");
+        Log.trace("vote()実行");
 
         TalkEndObserver talkEndObserver = new TalkEndObserver(gameInfo, boardSurface, wExpect, pExpect);
         talkEndObserver.check();
@@ -140,7 +140,7 @@ public class Fuku6u implements Player {
 
     @Override
     public Agent attack() {
-        Log.debug("attack()実行");
+        Log.trace("attack()実行");
         // TODO 投票噛みは回避できる？
         List<Agent> candidateAgentList = new ArrayList<>();
 
@@ -191,7 +191,7 @@ public class Fuku6u implements Player {
 
     @Override
     public Agent divine() {
-        Log.debug("divine()実行");
+        Log.trace("divine()実行");
         List<Agent> candidateAgentList = boardSurface.getCandidateDivinedAgentList(gameInfo.getAliveAgentList());
         // 人狼の可能性が高いエージェントを占う
         List<Agent> maxDistrustAgents = wExpect.getMaxDistrustAgent(candidateAgentList);
@@ -208,7 +208,7 @@ public class Fuku6u implements Player {
 
     @Override
     public Agent guard() {
-        Log.debug("guard()実行");
+        Log.trace("guard()実行");
         // 確定占い師が存在する場合は占い師をguardする
         // 確定霊能者が存在する場合は霊能者をguardする
         // 占い師の中から人狼の可能性が低い方を選択する
@@ -225,7 +225,7 @@ public class Fuku6u implements Player {
 
     @Override
     public void finish() {
-        Log.debug("finish()実行");
+        Log.trace("finish()実行");
         // TODO 最新版では2度呼ばれなくなる．とりあえず2度呼ばれてもいいようにしておく
         if (isFinish) {  // finishが2回目に呼び出されるとき，処理をしない
             return;
@@ -271,7 +271,7 @@ public class Fuku6u implements Player {
     }
     @Override
     public String getName() {
-        Log.debug("getName()実行");
+        Log.trace("getName()実行");
         return "Fuku6u";
     }
 
@@ -338,6 +338,7 @@ public class Fuku6u implements Player {
 //                    break;
                         case VOTE:
                             boardSurface.addVote(gameInfo.getDay(), talk.getAgent(), content.getTarget()); // 投票先発言を保管
+                            TalkObserver.vote(boardSurface, talk.getDay(), talk.getIdx(), talk.getAgent(), content.getTarget());
                             break;
 //                case ATTACK:
 //                    break;

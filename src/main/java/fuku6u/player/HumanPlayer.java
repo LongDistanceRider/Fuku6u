@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class HumanPlayer implements Player {
+
+    private GameInfo gameInfo;
     @Override
     public String getName() {
         return "HumanPlayer";
@@ -17,23 +19,25 @@ public class HumanPlayer implements Player {
 
     @Override
     public void update(GameInfo gameInfo) {
-
+        this.gameInfo = gameInfo;
     }
 
     @Override
     public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
-
+        this.gameInfo = gameInfo;
     }
 
     @Override
     public void dayStart() {
-
+        if (gameInfo.getDay() == 1) {
+            System.out.println("HumanPlayer_Role: " + gameInfo.getRole());
+        }
     }
 
     @Override
     public String talk() {
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

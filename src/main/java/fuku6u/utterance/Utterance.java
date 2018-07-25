@@ -82,6 +82,22 @@ public class Utterance {
         }
     }
 
+    public void offer(Topic topic, TalkType talkType, int day, int id, String nlString) {
+        if (Flag.isNL()) {
+            offer(nlString);
+        } else {
+            switch (topic) {
+                case AGREE:
+                    ContentBuilder builder = new AgreeContentBuilder(talkType, day, id);
+                    offer(new Content(builder).getText());
+                    return;
+                case DISAGREE:
+                    ContentBuilder builder2 = new DisagreeContentBuilder(talkType, day, id);
+                    offer(new Content(builder2).getText());
+                    return;
+            }
+        }
+    }
 
     /**
      * キューに発言を追加

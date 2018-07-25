@@ -5,6 +5,7 @@ import fuku6u.Expectation.PossessedExpectation;
 import fuku6u.Expectation.WolfGroupExpectation;
 import fuku6u.board.BoardSurface;
 import fuku6u.utterance.Utterance;
+import org.aiwolf.client.lib.TalkType;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
@@ -100,5 +101,15 @@ public class TalkObserver extends Observer {
             // 黒を出されたエージェントは黒寄りに
             wExpect.distrustCalc(target, Parameter.likely);
         }
+    }
+
+    public static void vote(BoardSurface boardSurface, int day, int id, Agent submit, Agent target) {
+        // 自分に投票発言をしたか
+        if (target.equals(boardSurface.getMe())) {
+            Utterance.getInstance().offer(Topic.DISAGREE, TalkType.TALK, day, id, "ちょっと待ってよ。ボクより怪しい人いるよ！");
+        }
+        // 黒出ししたAgentに投票発言したか
+
+        // 白出ししたAgentに投票発言したか
     }
 }
