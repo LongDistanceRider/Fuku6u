@@ -104,7 +104,7 @@ public class Utterance {
      * @param utterance
      *  追加したい発言
      */
-    public void offer(String utterance) {
+    private void offer(String utterance) {
         // 空文字は処理しない
         if (utterance == "") {
             return;
@@ -121,6 +121,17 @@ public class Utterance {
         if (!flagList.contains(flagString)) {
             utteranceQueue.offer(utterance);
             flagList.add(flagString);
+        }
+    }
+
+    /**
+     * キューに発言を追加
+     * 自然言語のみを話すときに使う
+     * @param nlString
+     */
+    public void offerNL(String nlString) {
+        if (Flag.isNL()) {
+            offer(nlString);
         }
     }
 

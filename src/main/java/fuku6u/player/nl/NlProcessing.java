@@ -1,9 +1,12 @@
 package fuku6u.player.nl;
 
+import fuku6u.board.BoardSurface;
 import fuku6u.log.Log;
+import fuku6u.utterance.Utterance;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
+import org.aiwolf.common.net.GameInfo;
 import org.apache.lucene.search.spell.LevensteinDistance;
 import java.io.*;
 import java.nio.file.Files;
@@ -36,6 +39,10 @@ public class NlProcessing {
     private Agent submitAgent;
     /* submitがCOした役職 */
     private Role submitCoRole;
+    // BoardSurface
+    private BoardSurface boardSurface;
+    // GameInfo
+    private GameInfo gameInfo;
 
     static {
         // フィルタ情報の読み込み
@@ -87,7 +94,9 @@ public class NlProcessing {
         }
     }
 
-    public NlProcessing(Agent submitAgent, Role submitCoRole) {
+    public NlProcessing(GameInfo gameInfo, BoardSurface boardSurface, Agent submitAgent, Role submitCoRole) {
+        this.gameInfo = gameInfo;
+        this.boardSurface = boardSurface;
         this.submitAgent = submitAgent;
         this.submitCoRole = submitCoRole;
     }
@@ -260,6 +269,16 @@ public class NlProcessing {
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
                         if (target != null) {
+                            // 自分に投票発言をしているか
+                            Agent ageTarget = convertStringToAgent(target);
+                            if (boardSurface.getMe().toString().equals(target)) {
+                                Utterance.getInstance().offerNL(">>" + submitAgent + " " + "ちょっと待ってよ。自分は人間だって。そんなことを言う" + submitAgent + "の印象はすごく悪いよ！");
+                            } else if (ageTarget != null && boardSurface.getAssignRole().getBlackAgentList().contains(ageTarget)) {
+                                // 黒出ししたエージェントに投票しているか
+                                Utterance.getInstance().offerNL(">>" + submitAgent + " " + "賛成！" + target + "に投票しよう。");
+                            } else {
+                                Utterance.getInstance().offerNL(">>" + submitAgent + " " + target + "に投票？んーまだ分からないから保留したいよ。");
+                            }
 //                            protocolTextList.add("REQUEST VOTE " + target);   // REQUESTの書き方がわからないので，コメントアウトしておく
                         } else {
                             Log.warn("REQUEST_VOTE変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
@@ -270,7 +289,10 @@ public class NlProcessing {
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
                         if (target != null) {
-                            // TODO NL話題の処理をここに書く
+                            // 自分に嘘つき発言をしているか
+                            if (boardSurface.getMe().toString().equals(target)) {
+                                Utterance.getInstance().offerNL(">>" + submitAgent + " " + "そう言う君も本当のことを言ってるか怪しい。");
+                            }
                         } else {
                             Log.warn("LIAR変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
@@ -280,7 +302,10 @@ public class NlProcessing {
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
                         if (target != null) {
-                            // TODO NL話題の処理をここに書く
+                            // 自分に疑い発言をしているか
+                            if (boardSurface.getMe().toString().equals(target)) {
+                                Utterance.getInstance().offerNL(">>" + submitAgent + " " + "ボクは" + submitAgent + "のこと信じてるよ。半分くらいね。");
+                            }
                         } else {
                             Log.warn("SUSPICIOUS変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
@@ -290,7 +315,10 @@ public class NlProcessing {
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
                         if (target != null) {
-                            // TODO NL話題の処理をここに書く
+                            // 自分に疑い発言をしているか
+                            if (boardSurface.getMe().toString().equals(target)) {
+                                Utterance.getInstance().offerNL(">>" + submitAgent + " " + "ボクも" + submitAgent + "のこと信じてるよ！");
+                            }
                         } else {
                             Log.warn("TRUST変換中に予期しないエラー（null）が発生しました．talkText: " + text.getTalkText());
                             break;
@@ -403,5 +431,15 @@ public class NlProcessing {
         return true;
     }
 
+    private Agent convertStringToAgent(String strAgent) {
+        for (Agent agent :
+                gameInfo.getAgentList()) {
+            if (agent.toString().equals(strAgent)) {
+                return agent;
+            }
+        }
+        Log.warn("StringからAgentへの変換が失敗しました．strAgent: " + strAgent);
+        return null;
+    }
 
 }

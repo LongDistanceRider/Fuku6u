@@ -14,7 +14,7 @@ public class Flag {
     private static final boolean nl = true;
 
     /* Logを書き出す最大レベル */
-    private static final LogLevel maxLogLevel = LogLevel.DEBUG;
+    private static final LogLevel maxLogLevel = LogLevel.TRACE;
 
     public static boolean isNL() {
         return nl;

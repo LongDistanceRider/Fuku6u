@@ -107,11 +107,11 @@ public class TalkObserver extends Observer {
     public static void vote(BoardSurface boardSurface, int day, int id, Agent submit, Agent target) {
         // 自分に投票発言をしたか
         if (target.equals(boardSurface.getMe())) {
-            Utterance.getInstance().offer(Topic.DISAGREE, TalkType.TALK, day, id, "ちょっと待ってよ。ボクより怪しい人いるよ！");
+            Utterance.getInstance().offer(Topic.DISAGREE, TalkType.TALK, day, id, ">>" + submit + " " + "ちょっと待ってよ。ボクより怪しい人いるよ！");
         }
         // 黒出ししたAgentに投票発言したか
         if (boardSurface.getAssignRole().getBlackAgentList().contains(target)) {
-                Utterance.getInstance().offer(Topic.AGREE, TalkType.TALK, day, id, submit + "に賛成！" + target + "に投票しよう");
+                Utterance.getInstance().offer(Topic.AGREE, TalkType.TALK, day, id, ">>" + submit + " " + submit + "に賛成！" + target + "に投票しよう");
         }
         // 白出ししたAgentに投票発言したか
         if (boardSurface.getAssignRole().getBlackAgentList().contains(target)) {
@@ -120,7 +120,7 @@ public class TalkObserver extends Observer {
         // 占い師結果で白がわかっている人に投票しようとしているかを確認
         if (boardSurface.getAssignRole().getRole().equals(Role.SEER) &&
                 boardSurface.getAssignRole().getResultWhiteAgentList().contains(target)) {
-            Utterance.getInstance().offer(Topic.DISAGREE, TalkType.TALK, day, id, submit + "に投票かぁ。ボク視点では白っぽいんだよね。");
+            Utterance.getInstance().offer(Topic.DISAGREE, TalkType.TALK, day, id, ">>" + submit + " " + target + "に投票かぁ。ボク視点では白っぽいんだよね。");
         }
     }
 }

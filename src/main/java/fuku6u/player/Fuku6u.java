@@ -291,7 +291,7 @@ public class Fuku6u implements Player {
             List<String> protocolTextList = new ArrayList<>();
             if (Flag.isNL()) {
                 // NL処理をかませる
-                NlProcessing nlProcessing = new NlProcessing(talk.getAgent(), boardSurface.getCoRole(talk.getAgent()));
+                NlProcessing nlProcessing = new NlProcessing(gameInfo, boardSurface, talk.getAgent(), boardSurface.getCoRole(talk.getAgent()));
                 protocolTextList = nlProcessing.convert(talk.getText());
             } else {
                 protocolTextList.add(talk.getText());

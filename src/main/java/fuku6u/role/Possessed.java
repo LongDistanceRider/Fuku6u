@@ -18,6 +18,7 @@ public class Possessed extends AbstractRole {
 
     /* 前回投票したエージェント（再投票時に利用） */
     private Agent preVoteAgent;
+    private Agent forceVoteAgent;
 
     @Override
     public Role getRole() {
@@ -43,6 +44,7 @@ public class Possessed extends AbstractRole {
             resultMap.put(target, Species.WEREWOLF);
             // 占い結果を発言
             blackAgentList.add(target);
+            forceVoteAgent = target;
             Utterance.getInstance().offer(Topic.DIVINED, target, Species.HUMAN, target + "を占った結果は人狼だったよ！");    // 「targetを占った結果白だった」
         }
 
@@ -105,6 +107,10 @@ public class Possessed extends AbstractRole {
                     return roleCoAgentList;
                 }
             }
+        }
+        // 強制投票先が設定されている場合は，そのエージェントに投票
+        if (forceVoteAgent != null) {
+            return Arrays.asList(forceVoteAgent);
         }
 
         // 1.黒出しされているエージェントに投票
