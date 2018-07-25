@@ -12,6 +12,7 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
 
 import java.util.List;
+import java.util.Map;
 
 public class TalkObserver extends Observer {
 
@@ -109,7 +110,17 @@ public class TalkObserver extends Observer {
             Utterance.getInstance().offer(Topic.DISAGREE, TalkType.TALK, day, id, "ちょっと待ってよ。ボクより怪しい人いるよ！");
         }
         // 黒出ししたAgentに投票発言したか
-
+        if (boardSurface.getAssignRole().getBlackAgentList().contains(target)) {
+                Utterance.getInstance().offer(Topic.AGREE, TalkType.TALK, day, id, submit + "に賛成！" + target + "に投票しよう");
+        }
         // 白出ししたAgentに投票発言したか
+        if (boardSurface.getAssignRole().getBlackAgentList().contains(target)) {
+            Utterance.getInstance().offer(Topic.DISAGREE, TalkType.TALK, day, id, ">>" + submit + " " + target + "は白だよ！");
+        }
+        // 占い師結果で白がわかっている人に投票しようとしているかを確認
+        if (boardSurface.getAssignRole().getRole().equals(Role.SEER) &&
+                boardSurface.getAssignRole().getResultWhiteAgentList().contains(target)) {
+            Utterance.getInstance().offer(Topic.DISAGREE, TalkType.TALK, day, id, submit + "に投票かぁ。ボク視点では白っぽいんだよね。");
+        }
     }
 }

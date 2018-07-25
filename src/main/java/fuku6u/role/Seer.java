@@ -24,8 +24,6 @@ public class Seer extends AbstractRole {
     private GameSetting gameSetting;
     /* 強制投票先 */
     private Agent forceVoteAgent = null;
-    /* 占い結果 */
-    private Map<Agent, Species> resultMap = new HashMap<>();
 
     public Seer(GameSetting gameSetting) {
         this.gameSetting = gameSetting;
@@ -53,6 +51,7 @@ public class Seer extends AbstractRole {
                     candidateAgentList.remove(gameInfo.getAgent());
                     candidateAgentList.remove(target);
                     Agent lieBlackResultAgent = Util.randomElementSelect(candidateAgentList);
+                    blackAgentList.add(lieBlackResultAgent);
                     Utterance.getInstance().offer(Topic.DIVINED, lieBlackResultAgent, Species.WEREWOLF, lieBlackResultAgent + "を占った結果は人狼だよ！");
                     // 強制投票先に設定
                     forceVoteAgent = lieBlackResultAgent;

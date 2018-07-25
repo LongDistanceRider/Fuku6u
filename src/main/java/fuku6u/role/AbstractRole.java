@@ -6,9 +6,13 @@ import fuku6u.board.BoardSurface;
 import fuku6u.board.Util;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
+import org.aiwolf.common.data.Species;
 import org.aiwolf.common.net.GameInfo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 役職固有クラスの継承元クラス
@@ -17,6 +21,16 @@ public abstract class AbstractRole {
 
     /* PP発生 */
     protected boolean isPP = false;
+    // 占い結果
+    protected Map<Agent, Species> resultMap = new HashMap<>();
+    // 黒出ししたエージェント
+    protected List<Agent> blackAgentList = new ArrayList<>();
+    // 白出ししたエージェント
+    protected List<Agent> whiteAgentList = new ArrayList<>();
+
+    public List<Agent> getBlackAgentList() {
+        return blackAgentList;
+    }
 
     public abstract  Role getRole();
 
@@ -26,6 +40,18 @@ public abstract class AbstractRole {
 
     public abstract void finish(BoardSurface boardSurface);
 
+    /**
+     * 占い結果で白が出ているAgentのリストを返す
+     */
+    public List<Agent> getResultWhiteAgentList() {
+        List<Agent> resultWhiteAgentList = new ArrayList<>();
+        resultMap.forEach(((agent, species) -> {
+            if (species.equals(Species.HUMAN)) {
+                resultWhiteAgentList.add(agent);
+            }
+        }));
+        return resultWhiteAgentList;
+    }
     /**
      * vote()処理
      * 村人側陣営の処理をデフォルトとしてこのクラスに書く

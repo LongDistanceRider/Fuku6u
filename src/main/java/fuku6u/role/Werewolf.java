@@ -20,8 +20,6 @@ import java.util.*;
  */
 public class Werewolf extends AbstractRole {
 
-    /* 占い結果 */
-    private Map<Agent, Species> divinedMap = new HashMap<>();
     /* 人狼メンバー */
     private List<Agent> werewolfList = new ArrayList<>();
     /* vote再投票フラグ */
@@ -36,22 +34,23 @@ public class Werewolf extends AbstractRole {
 
     @Override
     public void dayStart(GameInfo gameInfo, BoardSurface bs, WolfGroupExpectation wExpect, PossessedExpectation pExpect) {
-        // TODO 戦略として占い師 COすることが状況を良くするのか，常に白だしするだけでいいのかを考慮する必要がある
+        // TODO 戦略として占い師 COすることが状況を良くするのか，常に黒だしするだけでいいのかを考慮する必要がある
         Utterance.getInstance().offer(Topic.COMINGOUT, bs.getMe(), Role.SEER, "ボクが本当の占い師だよ！対抗に騙されないで！");  // CO
         //  ----- 占い結果を作成する -----
         List<Agent> candidatesAgentList = gameInfo.getAliveAgentList();
         candidatesAgentList.remove(bs.getMe());
         // すでに占ったプレイヤは削除
-        divinedMap.forEach(((agent, species) -> candidatesAgentList.remove(agent)));
+        resultMap.forEach(((agent, species) -> candidatesAgentList.remove(agent)));
         // 占い候補がいない場合（6日目ぐらいで既に占ったプレイヤしか生き残らなくなる）はスキップ
         if (!candidatesAgentList.isEmpty()) {
             // 適当な相手を占ったことにする
             Agent target = Util.randomElementSelect(candidatesAgentList);
-            Log.trace("偽占い結果白出し: " + target);
+            Log.trace("偽占い結果黒出し: " + target);
             // 占い結果を保管
-            divinedMap.put(target, Species.HUMAN);
+            resultMap.put(target, Species.WEREWOLF);
             // 占い結果を発言
-            Utterance.getInstance().offer(Topic.DIVINED, target, Species.HUMAN, target + "の占い結果は白だね。");    // 「targetを占った結果白だった」
+            blackAgentList.add(target);
+            Utterance.getInstance().offer(Topic.DIVINED, target, Species.HUMAN, target + "の占い結果は黒だね。");    // 「targetを占った結果白だった」
         }
         // パワープレイ判定（3人になった場合の判定．人狼COがあった場合のPP判定は別の場所で処理
         List<Agent> aliveAgentList = gameInfo.getAliveAgentList();
