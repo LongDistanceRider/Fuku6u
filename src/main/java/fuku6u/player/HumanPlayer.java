@@ -37,7 +37,7 @@ public class HumanPlayer implements Player {
     @Override
     public String talk() {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -49,6 +49,9 @@ public class HumanPlayer implements Player {
 //            reader.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        if (talk_String.equals("s")) {
+            talk_String = "Skip";
         }
         return talk_String;
     }

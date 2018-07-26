@@ -28,7 +28,7 @@ public class NlProcessing {
     /* PATH */
     private static final String dir = System.getProperty("user.dir");
     /* 照合する際に用いるレーベンシュタイン距離の閾値 */
-    private static final double DISTANCE_THRESHOLD = 0.5;
+    private static final double DISTANCE_THRESHOLD = 0.6;
     /* フィルタ情報 */
     private static List<String> filterList = new ArrayList<>();
     /* 照合ファイル */
@@ -185,7 +185,7 @@ public class NlProcessing {
             if (maxDistance > DISTANCE_THRESHOLD) {
                 Log.trace("最大ユークリッド距離獲得照合ファイル文: " + maxComparisonEntry.getKey() + " 距離: " + maxDistance);
             } else {
-                Log.trace("ユークリッド距離不足．最大ユークリッド距離獲得照合ファイル文:" + maxComparisonEntry.getKey() + " 距離: " + maxDistance);
+                Log.debug("ユークリッド距離不足．最大ユークリッド距離獲得照合ファイル文:" + maxComparisonEntry.getKey() + " 距離: " + maxDistance);
                 continue;
             }
             // 照合ファイルから話題を取って来た後，各話題の処理を行う
@@ -200,6 +200,9 @@ public class NlProcessing {
                         role = getRole(text, Integer.parseInt(topics[i+1]));
                         if (role != null) {
                             protocolTextList.add("COMINGOUT " + submitAgent + " " + role);   // プロトコル文変換
+                            if (role.equals("SEER")) {
+                                Utterance.getInstance().offerNL(submitAgent + "の占い師COを確認したよ！");
+                            }
                         } else {
                             Log.warn("Role型がnullのため変換に失敗しました．sentence: " + sentence + " role: " + role);
                             break;
@@ -224,8 +227,11 @@ public class NlProcessing {
                                 } else if (submitCoRole.equals(Role.MEDIUM)) {
                                     protocolTextList.add("IDENTIFIED " + target + " " + species);
                                 } else {
-                                    Log.warn("発言者がCOした役職が占霊ではないため，ESTIMATEに強制変換しました．");
-                                    protocolTextList.add("ESTIMATE " + target + " " + species);
+                                    Log.warn("5人人狼に霊能者がいないため，結果はDIVINEDに強制変換しました．");
+                                    protocolTextList.add("COMINGOUT " + submitAgent + " SEER");   // プロトコル文変換
+                                    protocolTextList.add("DIVINED " + target + " " + species);
+//                                    protocolTextList.add("ESTIMATE " + target + " " + species);
+                                    Utterance.getInstance().offerNL(submitAgent + "は占い師COかな？とりあえず、" + target + "が" + Utterance.convertSpeciesToNl(species) + "ってことで");
                                 }
                             } else {
                                 // 「占い結果」という単語がある場合のみ，COMINGOUT SEERとDIVINED発言とする．
@@ -266,6 +272,7 @@ public class NlProcessing {
                         }
                         break;
                     case "REQUEST_VOTE" :
+                        Log.debug("NlTopic: " + topics[i]);
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
                         if (target != null) {
@@ -286,6 +293,7 @@ public class NlProcessing {
                         }
                         break;
                     case "LIAR":
+                        Log.debug("NlTopic: " + topics[i]);
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
                         if (target != null) {
@@ -299,6 +307,7 @@ public class NlProcessing {
                         }
                         break;
                     case "SUSPICIOUS":
+                        Log.debug("NlTopic: " + topics[i]);
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
                         if (target != null) {
@@ -312,6 +321,7 @@ public class NlProcessing {
                         }
                         break;
                     case "TRUST":
+                        Log.debug("NlTopic: " + topics[i]);
                         // <TARGET>照合
                         target = getTargetString(text, Integer.parseInt(topics[i+1]));
                         if (target != null) {
@@ -325,13 +335,13 @@ public class NlProcessing {
                         }
                         break;
                     case "IMPOSSIBLE":  // 現在の手法では取り扱うことができない話題
-                        Log.trace("IMPOSSIBLE話題です．");
+                        Log.debug("NlTopic: " + topics[i]);
                         break;
                     case "NO_REQUIRED": // 処理不要な話題
-                        Log.trace("NO_REQUIRED話題です．");
+                        Log.debug("NlTopic: " + topics[i]);
                         break;
                     default:
-                        Log.warn("想定していないSwitch-defaultに分岐しました．sentence: " + sentence + " topics[i]" + topics[i]);
+                        Log.error("想定していないSwitch-defaultに分岐しました．sentence: " + sentence + " topics[i]" + topics[i]);
                         break;
 
                 }
